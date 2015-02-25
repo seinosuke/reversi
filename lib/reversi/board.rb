@@ -59,8 +59,8 @@ module Reversi
     end
 
     # 元に戻す
-    def undo!
-      @columns = @stack.pop
+    def undo!(num = 1)
+      num.times{ @columns = @stack.pop }
     end
 
     # 見かけ座標を渡してその地点の色を返す

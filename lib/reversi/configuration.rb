@@ -10,6 +10,7 @@ module Reversi
       :disk_w,
       :disk_color_b,
       :disk_color_w,
+      :display_progress
     ].freeze
 
     attr_accessor *OPTIONS_KEYS
@@ -23,12 +24,13 @@ module Reversi
     end
 
     def set_defaults
-      self.player_b     ||= Reversi::Player::RandomAI
-      self.player_w     ||= Reversi::Player::RandomAI
-      self.disk_b       ||= "b"
-      self.disk_w       ||= "w"
-      self.disk_color_b ||= 0
-      self.disk_color_w ||= 0
+      self.player_b         ||= Reversi::Player::RandomAI
+      self.player_w         ||= Reversi::Player::RandomAI
+      self.disk_b           ||= "b"
+      self.disk_w           ||= "w"
+      self.disk_color_b     ||= 0
+      self.disk_color_w     ||= 0
+      self.display_progress ||= false
     end
   end
 end

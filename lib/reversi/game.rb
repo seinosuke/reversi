@@ -26,6 +26,18 @@ module Reversi
     end
 
     def start
+      @display_progress ? run_with_progress : run
+    end
+
+    def run
+      loop do
+        break if game_over?
+        @player_b.move(@board)
+        @player_w.move(@board)
+      end
+    end
+
+    def run_with_progress
       puts @board.to_s
       printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
       loop do
@@ -38,8 +50,6 @@ module Reversi
         printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
       end
       puts @board.to_s
-      puts "black " << @player_b.count_my_disks.to_s
-      puts "white " << @player_w.count_my_disks.to_s
     end
 
     private

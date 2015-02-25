@@ -2,7 +2,7 @@
 
 module Reversi::Player
   class BasePlayer
-    attr_accessor :my_color, :opponent_color, :board
+    attr_reader :my_color, :opponent_color, :board
 
     def initialize(color, board)
       @my_color = color
