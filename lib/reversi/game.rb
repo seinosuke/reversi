@@ -30,22 +30,22 @@ module Reversi
       printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
       loop do
         break if game_over?
-        @player_b.move
+        @player_b.move(@board)
         puts @board.to_s
         printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
-        @player_w.move
+        @player_w.move(@board)
         puts @board.to_s
         printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
       end
       puts @board.to_s
-      puts "black " << @player_b.count_disks.to_s
-      puts "white " << @player_w.count_disks.to_s
+      puts "black " << @player_b.count_my_disks.to_s
+      puts "white " << @player_w.count_my_disks.to_s
     end
 
     private
 
     def game_over?
-      @player_w.next_moves.empty? && @player_b.next_moves.empty?
+      @player_w.my_next_moves.empty? && @player_b.my_next_moves.empty?
     end
   end
 end

@@ -4,7 +4,7 @@ module Reversi
   class Board
     attr_accessor :options, :columns, :stack
 
-    COORDINATES = (1..8).map{|x| (1..8).map{|y| [x, y]}}.flatten(1).freeze
+    COORDINATES = (:a..:h).map{|x| (1..8).map{|y| [x, y]}}.flatten(1).freeze
 
     DISK = {
       :none  =>  0,
@@ -37,7 +37,7 @@ module Reversi
     end
 
     def to_s
-      "     #{(:a..:h).to_a.map(&:to_s).map(&:upcase).join("   ")}\n" <<
+      "     #{(:a..:h).to_a.map(&:to_s).join("   ")}\n" <<
       "   #{"+---"*8}+\n" <<
       @columns[1][1..-2].zip(*@columns[2..8].map{|col| col[1..-2]})
       .map{|row| row.map do |e|
@@ -76,12 +76,6 @@ module Reversi
       count
     end
 
-    # 見かけ地点の座標を渡して更新
-    def put_disk(x, y, color)
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
-      @columns[x][y] = DISK[color.to_sym]
-    end
-
     # 現時点で石が置ける座標のリスト
     def next_moves(color)
       list = []
@@ -93,9 +87,16 @@ module Reversi
       list
     end
 
+    # 見かけ地点の座標を渡して更新
+    def put_disk(x, y, color)
+      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      @columns[x][y] = DISK[color.to_sym]
+    end
+
     # その地点にその色の石を置けるか
     # もし置けてさらに隣に異色があったらひっくり返せるか
     def put_disk?(x, y, color)
+      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
       # 既に石があったら置けない
       return false if @columns[x][y] != 0
       [-1,0,1].product([-1,0,1]).each do |dx, dy|

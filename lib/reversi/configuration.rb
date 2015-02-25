@@ -25,9 +25,9 @@ module Reversi
     def set_defaults
       self.player_b     ||= Reversi::Player::RandomAI
       self.player_w     ||= Reversi::Player::RandomAI
-      self.disk_b       ||= "O"
-      self.disk_w       ||= "O"
-      self.disk_color_b ||= 36
+      self.disk_b       ||= "b"
+      self.disk_w       ||= "w"
+      self.disk_color_b ||= 0
       self.disk_color_w ||= 0
     end
   end
