@@ -3,7 +3,7 @@
 module Reversi
   class Game
     attr_accessor *Configuration::OPTIONS_KEYS
-    attr_accessor :board
+    attr_accessor :board, :black_disks, :white_disks
 
     def initialize(options = {})
       Reversi.set_defaults
@@ -32,8 +32,13 @@ module Reversi
     def run
       loop do
         break if game_over?
+        @black_disks = [@board.count_disks(:none), @player_b.count_my_disks]
         @player_b.move(@board)
+        check_move_b
+
+        @white_disks = [@board.count_disks(:none), @player_w.count_my_disks]
         @player_w.move(@board)
+        check_move_w
       end
     end
 
@@ -42,10 +47,15 @@ module Reversi
       printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
       loop do
         break if game_over?
+        @black_disks = [@board.count_disks(:none), @player_b.count_my_disks]
         @player_b.move(@board)
+        check_move_b
         puts @board.to_s
         printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
+
+        @white_disks = [@board.count_disks(:none), @player_w.count_my_disks]
         @player_w.move(@board)
+        check_move_w
         puts @board.to_s
         printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
       end
@@ -54,6 +64,30 @@ module Reversi
 
     private
 
+    # Checks player_b's move to make sure it is valid.
+    def check_move_b
+      blank_diff = @black_disks[0] - @board.count_disks(:none)
+      unless [0, 1].include?(blank_diff)
+        raise MoveError, "a player must place a new piece on the board"
+      end
+      if blank_diff == 1 && (@player_b.count_my_disks - @black_disks[1]) < 2
+        raise MoveError, "a player must flip at least one or more opponent disks"
+      end
+    end
+
+    # Checks player_w's move to make sure it is valid.
+    def check_move_w
+      blank_diff = @white_disks[0] - @board.count_disks(:none)
+      unless [0, 1].include?(blank_diff)
+        raise MoveError, "a player must place a new piece on the board"
+      end
+      if blank_diff == 1 && (@player_w.count_my_disks - @white_disks[1]) < 2
+        raise MoveError, "a player must flip at least one or more opponent disks"
+      end
+    end
+
+    # Whether or not this game is over.
+    # Both players can't find a next move, that's the end of the game.
     def game_over?
       @player_w.my_next_moves.empty? && @player_b.my_next_moves.empty?
     end

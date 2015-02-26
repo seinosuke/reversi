@@ -10,7 +10,8 @@ module Reversi
       :disk_w,
       :disk_color_b,
       :disk_color_w,
-      :display_progress
+      :display_progress,
+      :stack_limit
     ].freeze
 
     attr_accessor *OPTIONS_KEYS
@@ -31,6 +32,7 @@ module Reversi
       self.disk_color_b     ||= 0
       self.disk_color_w     ||= 0
       self.display_progress ||= false
+      self.stack_limit      ||= 3
     end
   end
 end

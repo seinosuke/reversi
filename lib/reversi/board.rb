@@ -55,7 +55,7 @@ module Reversi
 
     def push_stack
       @stack.push(Marshal.load(Marshal.dump(@columns)))
-      @stack.shift if @stack.size > 3
+      @stack.shift if @stack.size > @options[:stack_limit]
     end
 
     # 元に戻す
