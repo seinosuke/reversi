@@ -3,26 +3,23 @@
 module Reversi
   class Game
     attr_accessor *Configuration::OPTIONS_KEYS
-    attr_accessor :board, :black_disks, :white_disks
+    attr_accessor :board, :black_disks, :white_disks, :vs_human
 
     def initialize(options = {})
       Reversi.set_defaults
       options = Reversi.options.merge(options)
-
       Configuration::OPTIONS_KEYS.each do |key|
         send("#{key}=".to_sym, options[key])
       end
 
+      if @player_b == Reversi::Player::Human || @player_w == Reversi::Player::Human
+        @vs_human = true
+        @display_progress = false
+      end
+      @vs_human ||= false
       @board = Board.new(options)
       @player_b = @player_b.new(:black, @board)
       @player_w = @player_w.new(:white, @board)
-    end
-
-    def before
-      @board.put_disk(:d, 4, :black)
-      @board.put_disk(:e, 5, :black)
-      @board.put_disk(:f, 5, :white)
-      puts @board.to_s
     end
 
     def start
@@ -40,6 +37,7 @@ module Reversi
         @player_w.move(@board)
         check_move_w
       end
+      puts @board.to_s if @vs_human
     end
 
     def run_with_progress
