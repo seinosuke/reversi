@@ -3,7 +3,7 @@
 module Reversi
   class Game
     attr_accessor *Configuration::OPTIONS_KEYS
-    attr_accessor :board, :black_disks, :white_disks, :vs_human
+    attr_accessor :board, :vs_human, :status
 
     def initialize(options = {})
       Reversi.set_defaults
@@ -14,7 +14,7 @@ module Reversi
 
       if @player_b == Reversi::Player::Human || @player_w == Reversi::Player::Human
         @vs_human = true
-        @display_progress = false
+        @progress = false
       end
       @vs_human ||= false
       @board = Board.new(options)
@@ -23,64 +23,55 @@ module Reversi
     end
 
     def start
-      @display_progress ? run_with_progress : run
+      options = {:progress => @progress, :vs_human => @vs_human}
+      run(options)
     end
 
-    def run
+    def run(options)
+      show_board if options[:progress]
       loop do
         break if game_over?
-        @black_disks = [@board.count_disks(:none), @player_b.count_my_disks]
-        @player_b.move(@board)
-        check_move_b
+        update_status
+        @player_b.move(@board); check_move(:black)
+        show_board if options[:progress]
 
-        @white_disks = [@board.count_disks(:none), @player_w.count_my_disks]
-        @player_w.move(@board)
-        check_move_w
+        update_status
+        @player_w.move(@board); check_move(:white)
+        show_board if options[:progress]
       end
-      puts @board.to_s if @vs_human
-    end
-
-    def run_with_progress
-      puts @board.to_s
-      printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
-      loop do
-        break if game_over?
-        @black_disks = [@board.count_disks(:none), @player_b.count_my_disks]
-        @player_b.move(@board)
-        check_move_b
-        puts @board.to_s
-        printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
-
-        @white_disks = [@board.count_disks(:none), @player_w.count_my_disks]
-        @player_w.move(@board)
-        check_move_w
-        puts @board.to_s
-        printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
-      end
-      puts @board.to_s
+      puts @board.to_s if options[:progress] || options[:vs_human]
     end
 
     private
 
-    # Checks player_b's move to make sure it is valid.
-    def check_move_b
-      blank_diff = @black_disks[0] - @board.count_disks(:none)
-      unless [0, 1].include?(blank_diff)
-        raise MoveError, "a player must place a new piece on the board"
-      end
-      if blank_diff == 1 && (@player_b.count_my_disks - @black_disks[1]) < 2
-        raise MoveError, "a player must flip at least one or more opponent disks"
-      end
+    def update_status
+      @status = {
+        :none  => @board.count_disks(:none),
+        :black => @board.count_disks(:black),
+        :white => @board.count_disks(:white)
+      }
     end
 
-    # Checks player_w's move to make sure it is valid.
-    def check_move_w
-      blank_diff = @white_disks[0] - @board.count_disks(:none)
-      unless [0, 1].include?(blank_diff)
-        raise MoveError, "a player must place a new piece on the board"
-      end
-      if blank_diff == 1 && (@player_w.count_my_disks - @white_disks[1]) < 2
-        raise MoveError, "a player must flip at least one or more opponent disks"
+    # Show the current status of this game board.
+    def show_board
+      puts @board.to_s
+      printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
+    end
+
+    # Checks a move to make sure it is valid.
+    def check_move(color)
+      blank_diff = @status[:none] - @board.count_disks(:none)
+      case blank_diff
+      when 1
+        if (@board.count_disks(color) - @status[color]) < 2
+          raise MoveError, "A player must flip at least one or more opponent disks."
+        end
+      when 0
+        unless (@board.count_disks(:black) - @status[:black]) == 0 &&
+               (@board.count_disks(:white) - @status[:white]) == 0
+          raise MoveError, "When a player can't make a valid move, you must not place a new disk."
+        end
+      else raise MoveError, "A player must place a new disk on the board."
       end
     end
 

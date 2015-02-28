@@ -10,7 +10,7 @@ module Reversi
       :disk_w,
       :disk_color_b,
       :disk_color_w,
-      :display_progress,
+      :progress,
       :stack_limit
     ].freeze
 
@@ -25,14 +25,14 @@ module Reversi
     end
 
     def set_defaults
-      self.player_b         ||= Reversi::Player::RandomAI
-      self.player_w         ||= Reversi::Player::RandomAI
-      self.disk_b           ||= "b"
-      self.disk_w           ||= "w"
-      self.disk_color_b     ||= 0
-      self.disk_color_w     ||= 0
-      self.display_progress ||= false
-      self.stack_limit      ||= 3
+      self.player_b     ||= Reversi::Player::RandomAI
+      self.player_w     ||= Reversi::Player::RandomAI
+      self.disk_b       ||= "b"
+      self.disk_w       ||= "w"
+      self.disk_color_b ||= 0
+      self.disk_color_w ||= 0
+      self.progress     ||= false
+      self.stack_limit  ||= 3
     end
   end
 end
