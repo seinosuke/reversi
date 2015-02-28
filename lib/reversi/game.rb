@@ -31,11 +31,11 @@ module Reversi
       show_board if options[:progress]
       loop do
         break if game_over?
-        update_status
+        @status = @board.status
         @player_b.move(@board); check_move(:black)
         show_board if options[:progress]
 
-        update_status
+        @status = @board.status
         @player_w.move(@board); check_move(:white)
         show_board if options[:progress]
       end
@@ -43,14 +43,6 @@ module Reversi
     end
 
     private
-
-    def update_status
-      @status = {
-        :none  => @board.count_disks(:none),
-        :black => @board.count_disks(:black),
-        :white => @board.count_disks(:white)
-      }
-    end
 
     # Show the current status of this game board.
     def show_board
@@ -78,7 +70,7 @@ module Reversi
     # Whether or not this game is over.
     # Both players can't find a next move, that's the end of the game.
     def game_over?
-      @player_w.my_next_moves.empty? && @player_b.my_next_moves.empty?
+      @player_w.next_moves.empty? && @player_b.next_moves.empty?
     end
   end
 end

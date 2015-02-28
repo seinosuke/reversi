@@ -4,7 +4,7 @@ module Reversi::Player
   class Human < BasePlayer
 
     def move(board)
-      return if my_next_moves.empty?
+      return if next_moves.empty?
       puts board.to_s
       input_move
       printf "\e[#{18}A"; STDOUT.flush
@@ -25,7 +25,7 @@ module Reversi::Player
         print "#{" "*9}"
         printf "\e[#{9}D"; STDOUT.flush
         redo if check_valid == :redo
-        put_my_disk(*@input_move)
+        put_disk(*@input_move)
         break
       end
     end
@@ -41,7 +41,7 @@ module Reversi::Player
     end
 
     def check_valid
-      unless my_next_moves.include?(@input_move)
+      unless next_moves.include?(@input_move)
         return :redo
       end
       :valid

@@ -2,7 +2,7 @@
 
 module Reversi
   class Board
-    attr_accessor :options, :columns, :stack
+    attr_reader :options, :columns, :stack
 
     COORDINATES = (:a..:h).map{|x| (1..8).map{|y| [x, y]}}.flatten(1).freeze
 
@@ -56,6 +56,10 @@ module Reversi
     def push_stack
       @stack.push(Marshal.load(Marshal.dump(@columns)))
       @stack.shift if @stack.size > @options[:stack_limit]
+    end
+
+    def status
+      Hash[*[:none, :black, :white].map{|key| [key, count_disks(key)]}.flatten]
     end
 
     # 元に戻す
