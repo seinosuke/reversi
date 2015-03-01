@@ -28,8 +28,12 @@ module Reversi
     def initialize(options = {})
       @options = options
       @stack = []
-      options[:disk_color_b] = DISK_COLOR[options[:disk_color_b]] if options[:disk_color_b].is_a? Symbol
-      options[:disk_color_w] = DISK_COLOR[options[:disk_color_w]] if options[:disk_color_w].is_a? Symbol
+      if options[:disk_color_b].is_a?(Symbol) || options[:disk_color_b].is_a?(String)
+        options[:disk_color_b] = DISK_COLOR[options[:disk_color_b].to_sym].to_i
+      end
+      if options[:disk_color_w].is_a?(Symbol) || options[:disk_color_w].is_a?(String)
+        options[:disk_color_w] = DISK_COLOR[options[:disk_color_w].to_sym].to_i
+      end
       @columns = (0..9).map{ (0..9).map{|_| DISK[:none]} }.tap{|rows| break rows[0].zip(*rows[1..-1])}
       put_disk(4, 4, :white); put_disk(5, 5, :white)
       put_disk(4, 5, :black); put_disk(5, 4, :black)
@@ -58,13 +62,13 @@ module Reversi
       @stack.shift if @stack.size > @options[:stack_limit]
     end
 
-    def status
-      Hash[*[:none, :black, :white].map{|key| [key, count_disks(key)]}.flatten]
-    end
-
     # 元に戻す
     def undo!(num = 1)
       num.times{ @columns = @stack.pop }
+    end
+
+    def status
+      Hash[*[:none, :black, :white].map{|key| [key, count_disks(key)]}.flatten]
     end
 
     # 見かけ座標を渡してその地点の色を返す
@@ -114,6 +118,7 @@ module Reversi
 
     # 自色で挟まれた石を複数列ひっくり返す
     def flip_disks(x, y, color)
+      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
       [-1,0,1].product([-1,0,1]).each do |dx, dy|
         next if dx == 0 && dy == 0
         # 隣接石が異色であったらflip_disks?でひっくり返せるか（挟まれているか）確認

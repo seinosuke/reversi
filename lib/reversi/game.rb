@@ -3,7 +3,7 @@
 module Reversi
   class Game
     attr_accessor *Configuration::OPTIONS_KEYS
-    attr_accessor :board, :vs_human, :status
+    attr_reader :board, :vs_human, :status
 
     def initialize(options = {})
       Reversi.set_defaults
