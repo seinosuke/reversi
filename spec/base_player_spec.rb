@@ -57,4 +57,12 @@ describe Reversi::Player::BasePlayer do
       end
     end
   end
+
+  describe "#my_disks" do
+    it { expect(player.my_disks).to eq [[:d, 5], [:e, 4]] }
+  end
+
+  describe "#opponent_disks" do
+    it { expect(player.opponent_disks).to eq [[:d, 4], [:e, 5]] }
+  end
 end

@@ -80,12 +80,9 @@ module Reversi
     # Returns the openness of the coordinates.
     def openness(x, y)
       x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
-      ans = 0
-      [-1,0,1].product([-1,0,1]).each do |dx, dy|
-        next if dx == 0 && dy == 0
-        ans += 1 if @columns[x + dx][y + dy] == 0
+      ([-1,0,1].product([-1,0,1]) - [[0, 0]]).inject(0) do |sum, d|
+        sum + (@columns[x + d[0]][y + d[1]] == 0 ? 1 : 0)
       end
-      ans
     end
 
     # 見かけ座標を渡してその地点の色を返す

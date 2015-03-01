@@ -36,5 +36,13 @@ module Reversi::Player
     def count_disks(my_color = true)
       @board.count_disks(my_color ? @my_color : @opponent_color)
     end
+
+    def my_disks
+      @board.detailed_status[@my_color]
+    end
+
+    def opponent_disks
+      @board.detailed_status[@opponent_color]
+    end
   end
 end
