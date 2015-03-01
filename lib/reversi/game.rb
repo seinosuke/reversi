@@ -56,7 +56,7 @@ module Reversi
       case blank_diff
       when 1
         if (@board.count_disks(color) - @status[color]) < 2
-          raise MoveError, "A player must flip at least one or more opponent disks."
+          raise MoveError, "A player must flip at least one or more opponent's disks."
         end
       when 0
         unless (@board.count_disks(:black) - @status[:black]) == 0 &&

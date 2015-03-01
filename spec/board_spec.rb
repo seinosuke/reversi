@@ -78,6 +78,25 @@ describe Reversi::Board do
     end
   end
 
+  describe "#detailed_status" do
+    let(:disk_color_b) { 0 }
+    let(:disk_color_w) { 0 }
+    it "returns a hash containing the coordinates of each color" do
+      expect{ board.put_disk(:a, 1, :black) }.to change{ board.detailed_status[:black].size }.by(1)
+      expect{ board.put_disk(:b, 1, :black) }.to change{ board.detailed_status[:none].size }.by(-1)
+    end
+  end
+
+  describe "#openness" do
+    let(:disk_color_b) { 0 }
+    let(:disk_color_w) { 0 }
+    it "returns the openness of the coordinates" do
+      expect(board.openness(:a, 1)).to eq 3
+      expect(board.openness(:b, 2)).to eq 8
+      expect(board.openness(:d, 4)).to eq 5
+    end
+  end
+
   describe "#at" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
@@ -115,7 +134,7 @@ describe Reversi::Board do
   describe "#put_disk, #flip_disks" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it "flips the opponent's disks between a new disk and another my disk" do
+    it "flips the opponent's disks between a new disk and my disk" do
       board.put_disk(:d, 6, :white)
       board.put_disk(:e, 3, :white)
       board.put_disk(:f, 3, :black)

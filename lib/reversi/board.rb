@@ -71,6 +71,23 @@ module Reversi
       Hash[*[:none, :black, :white].map{|key| [key, count_disks(key)]}.flatten]
     end
 
+    def detailed_status
+      Hash[*[:none, :black, :white].map do |key|
+        [key, COORDINATES.map{|x, y| [x, y] if key == at(x, y) }.compact]
+      end.flatten(1)]
+    end
+
+    # Returns the openness of the coordinates.
+    def openness(x, y)
+      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      ans = 0
+      [-1,0,1].product([-1,0,1]).each do |dx, dy|
+        next if dx == 0 && dy == 0
+        ans += 1 if @columns[x + dx][y + dy] == 0
+      end
+      ans
+    end
+
     # 見かけ座標を渡してその地点の色を返す
     # board.at(:a, 1) #=> :white
     def at(x, y)
@@ -88,7 +105,7 @@ module Reversi
     def next_moves(color)
       list = []
       @columns[1..8].map{|col| col[1..-2]}.flatten.each_with_index do |val, i|
-        if put_disk?(*COORDINATES[i], color)
+        if puttable?(*COORDINATES[i], color)
           list << COORDINATES[i]
         end
       end
@@ -103,14 +120,14 @@ module Reversi
 
     # その地点にその色の石を置けるか
     # もし置けてさらに隣に異色があったらひっくり返せるか
-    def put_disk?(x, y, color)
+    def puttable?(x, y, color)
       x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
       # 既に石があったら置けない
       return false if @columns[x][y] != 0
       [-1,0,1].product([-1,0,1]).each do |dx, dy|
         next if dx == 0 && dy == 0
         if @columns[x + dx][y + dy] == DISK[color]*(-1)
-          return true if flip_disks?(x, y, dx, dy, color)
+          return true if flippable?(x, y, dx, dy, color)
         end
       end
       false
@@ -121,15 +138,15 @@ module Reversi
       x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
       [-1,0,1].product([-1,0,1]).each do |dx, dy|
         next if dx == 0 && dy == 0
-        # 隣接石が異色であったらflip_disks?でひっくり返せるか（挟まれているか）確認
+        # 隣接石が異色であったらflippable?でひっくり返せるか（挟まれているか）確認
         if @columns[x + dx][y + dy] == DISK[color]*(-1)
-          flip_disk(x, y, dx, dy, color) if flip_disks?(x, y, dx, dy, color)
+          flip_disk(x, y, dx, dy, color) if flippable?(x, y, dx, dy, color)
         end
       end
     end
 
     # 自色で挟まれた石を1列ひっくり返す
-    # flip_disks?で挟まれていることが確認されてから使え
+    # flippable?で挟まれていることが確認されてから使え
     # 次のマスが壁、何もないマス、自色があるマスであれば終了
     def flip_disk(x, y, dx, dy, color)
       return if [DISK[:wall], DISK[:none], DISK[color]].include?(@columns[x+dx][y+dy])
@@ -138,7 +155,7 @@ module Reversi
     end
 
     # その先に自分と同色が出現したらtrue
-    def flip_disks?(x, y, dx, dy, color)
+    def flippable?(x, y, dx, dy, color)
       loop do
         x += dx; y += dy
         return true if @columns[x][y] == DISK[color]
