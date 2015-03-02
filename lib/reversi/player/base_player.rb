@@ -1,5 +1,3 @@
-# coding: utf-8
-
 module Reversi::Player
   class BasePlayer
     attr_reader :my_color, :opponent_color, :board
@@ -13,6 +11,12 @@ module Reversi::Player
     def move(board)
     end
 
+    # Places a supplied color's disk on specified position,
+    # and flips the opponent's disks.
+    #
+    # @param x [Symbol, Integer] the column number
+    # @param y [Integer] the row number
+    # @param my_color [Boolean] my color or opponent's color
     def put_disk(x, y, my_color = true)
       color = my_color ? @my_color : @opponent_color
       @board.push_stack
@@ -28,11 +32,18 @@ module Reversi::Player
       openness
     end
 
-    # @return An array of next moves.
+    # Returns an array of the next moves.
+    #
+    # @param my_color [Boolean] my color or opponent's color
+    # @return [Array] the next moves
     def next_moves(my_color = true)
       @board.next_moves(my_color ? @my_color : @opponent_color)
     end
 
+    # Returns a number of the supplied color's disks.
+    #
+    # @param my_color [Boolean] my color or opponent's color
+    # @return [Integer] a number of the supplied color's disks
     def count_disks(my_color = true)
       @board.count_disks(my_color ? @my_color : @opponent_color)
     end

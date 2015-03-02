@@ -1,5 +1,3 @@
-# coding: utf-8
-
 module Reversi
   class Board
     attr_reader :options, :columns, :stack

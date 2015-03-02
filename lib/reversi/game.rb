@@ -1,33 +1,51 @@
-# coding: utf-8
-
 module Reversi
   class Game
     attr_accessor *Configuration::OPTIONS_KEYS
-    attr_reader :board, :vs_human, :status
+    attr_reader :options, :board, :vs_human, :status
 
+    # Initializes a new Board object.
     def initialize(options = {})
       Reversi.set_defaults
-      options = Reversi.options.merge(options)
+      @options = Reversi.options.merge(options)
       Configuration::OPTIONS_KEYS.each do |key|
-        send("#{key}=".to_sym, options[key])
+        send("#{key}=".to_sym, @options[key])
       end
 
-      if @player_b == Reversi::Player::Human || @player_w == Reversi::Player::Human
+      if [@player_b, @player_w].include? Reversi::Player::Human
         @vs_human = true
         @progress = false
       end
       @vs_human ||= false
-      @board = Board.new(options)
-      @player_b = @player_b.new(:black, @board)
-      @player_w = @player_w.new(:white, @board)
+
+      @board = Board.new(@options)
+      @player_class_b = @player_b
+      @player_class_w = @player_w
+      @player_b = @player_class_b.new(:black, @board)
+      @player_w = @player_class_w.new(:white, @board)
     end
 
+    # Set the option values and start a game.
+    #
+    # @see #run
     def start
       options = {:progress => @progress, :vs_human => @vs_human}
       run(options)
     end
 
-    def run(options)
+    # Reset the instance variable, `@board`.
+    def reset
+      @board = Board.new(@options)
+      @player_b = @player_class_b.new(:black, @board)
+      @player_w = @player_class_w.new(:white, @board)
+    end
+
+    private
+
+    # Execute a game and run until the end of the game.
+    #
+    # @option options [Boolean] :progress Display the progress of the game.
+    # @option options [Boolean] :vs_human 
+    def run(options = {})
       show_board if options[:progress]
       loop do
         break if game_over?
@@ -42,9 +60,7 @@ module Reversi
       puts @board.to_s if options[:progress] || options[:vs_human]
     end
 
-    private
-
-    # Show the current status of this game board.
+    # Show the current state of this game board.
     def show_board
       puts @board.to_s
       printf "\e[#{18}A"; STDOUT.flush; sleep 0.1
