@@ -10,13 +10,6 @@ describe Reversi::Player::BasePlayer do
       it "flips the opponent's disks between a new disk and my disk" do
         expect{ player.put_disk(:d, 3) }.to change{ board.status[:black] }.by(2)
       end
-
-      it "returns the openness of the move" do
-        expect(player.put_disk(:d, 3)).to eq 5
-        board.put_disk(:d, 4, :white)
-        board.put_disk(:c, 3, :black)
-        expect(player.put_disk(:f, 6)).to eq 8
-      end
     end
 
     context "when a player make an invalid move" do
@@ -34,11 +27,31 @@ describe Reversi::Player::BasePlayer do
 
   describe "#next_moves" do
     context "when the first argument is omitted" do
-      it { expect(player.next_moves).to eq [[:c, 4], [:d, 3], [:e, 6], [:f, 5]] }
+      it do
+        ans = [[:c, 4], [:d, 3], [:e, 6], [:f, 5]]
+        expect(player.next_moves.map{ |move| move[:move] }).to eq ans
+      end
+
+      it do
+        player.put_disk(:d, 3)
+        player.put_disk(:e, 3, false)
+        expect(player.next_moves[1][:openness]).to eq 8
+        expect(player.next_moves[1][:result]).to eq [[:e, 3], [:e, 4]]
+      end
     end
 
     context "when the first argument is `false`" do
-      it { expect(player.next_moves(false)).to eq [[:c, 5], [:d, 6], [:e, 3], [:f, 4]] }
+      it do
+        ans = [[:c, 5], [:d, 6], [:e, 3], [:f, 4]]
+        expect(player.next_moves(false).map{ |move| move[:move] }).to eq ans
+      end
+
+      it do
+        player.put_disk(:d, 3)
+        player.put_disk(:e, 3, false)
+        expect(player.next_moves(false)[0][:openness]).to eq 5
+        expect(player.next_moves(false)[0][:result]).to eq [[:d, 3]]
+      end
     end
   end
 

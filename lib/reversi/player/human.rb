@@ -2,7 +2,7 @@ module Reversi::Player
   class Human < BasePlayer
 
     def move(board)
-      return if next_moves.empty?
+      return if next_moves.map{ |v| v[:move] }.empty?
       puts board.to_s
       input_move
       printf "\e[#{18}A"; STDOUT.flush
@@ -14,7 +14,8 @@ module Reversi::Player
 
     def input_move
       loop do
-        print "#{@my_color}: "; @input_move = gets.chomp.split("")
+        print "#{@my_color}: "
+        @input_move = gets.chomp.split("")
         exit if @input_move == ["q"]
         redo if check_size == :redo
         @input_move[0] = @input_move[0].to_sym
@@ -39,7 +40,7 @@ module Reversi::Player
     end
 
     def check_valid
-      unless next_moves.include?(@input_move)
+      unless next_moves.map{ |v| v[:move] }.include?(@input_move)
         return :redo
       end
       :valid

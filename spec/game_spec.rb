@@ -13,7 +13,10 @@ describe Reversi::Game do
     end
 
     context "before `player_w` places a piece on position [f4]" do
-      it { expect(@game.player_w.next_moves).to eq [[:c, 5], [:d, 6], [:e, 3], [:f, 4], [:g, 5], [:g, 7]] }
+      it do
+        ans = [[:c, 5], [:d, 6], [:e, 3], [:f, 4], [:g, 5], [:g, 7]]
+        expect(@game.player_w.next_moves.map{ |move| move[:move] }).to eq ans
+      end
       it { expect(@game.player_w.count_disks).to eq 3 }
       it { expect(@game.player_b.count_disks).to eq 7 }
     end
@@ -22,7 +25,10 @@ describe Reversi::Game do
       before do
         @game.player_w.put_disk(:f, 4)
       end
-      it { expect(@game.player_w.next_moves).to eq [[:c, 5], [:c, 6], [:d, 6], [:f, 2], [:g, 2], [:h, 3]] }
+      it do
+        ans = [[:c, 5], [:c, 6], [:d, 6], [:f, 2], [:g, 2], [:h, 3]]
+        expect(@game.player_w.next_moves.map{ |move| move[:move] }).to eq ans
+      end
       it { expect(@game.player_w.count_disks).to eq 7 }
       it { expect(@game.player_b.count_disks).to eq 4 }
     end
