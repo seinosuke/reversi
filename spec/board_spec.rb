@@ -134,7 +134,7 @@ describe Reversi::Board do
   describe "#put_disk, #flip_disks" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it "flips the opponent's disks between a new disk and my disk" do
+    it "flips the opponent's disks between a new disk and another disk of my color" do
       board.put_disk(:d, 6, :white)
       board.put_disk(:e, 3, :white)
       board.put_disk(:f, 3, :black)
