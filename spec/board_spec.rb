@@ -72,18 +72,9 @@ describe Reversi::Board do
   describe "#status" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it "returns a hash containing the number of each color" do
-      expect{ board.put_disk(:a, 1, :black) }.to change{ board.status[:black] }.by(1)
-      expect{ board.put_disk(:b, 1, :black) }.to change{ board.status[:none] }.by(-1)
-    end
-  end
-
-  describe "#detailed_status" do
-    let(:disk_color_b) { 0 }
-    let(:disk_color_w) { 0 }
     it "returns a hash containing the coordinates of each color" do
-      expect{ board.put_disk(:a, 1, :black) }.to change{ board.detailed_status[:black].size }.by(1)
-      expect{ board.put_disk(:b, 1, :black) }.to change{ board.detailed_status[:none].size }.by(-1)
+      expect{ board.put_disk(:a, 1, :black) }.to change{ board.status[:black].size }.by(1)
+      expect{ board.put_disk(:b, 1, :black) }.to change{ board.status[:none].size }.by(-1)
     end
   end
 
@@ -139,7 +130,7 @@ describe Reversi::Board do
       board.put_disk(:e, 3, :white)
       board.put_disk(:f, 3, :black)
       board.put_disk(:d, 3, :black)
-      expect{ board.flip_disks(:d, 3, :black) }.to change{ board.status[:black] }.by(2)
+      expect{ board.flip_disks(:d, 3, :black) }.to change{ board.status[:black].size }.by(2)
     end
   end
 end

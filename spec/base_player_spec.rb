@@ -8,7 +8,7 @@ describe Reversi::Player::BasePlayer do
   describe "#put_disk" do
     context "when a player make a valid move" do
       it "flips the opponent's disks between a new disk and my disk" do
-        expect{ player.put_disk(:d, 3) }.to change{ board.status[:black] }.by(2)
+        expect{ player.put_disk(:d, 3) }.to change{ board.status[:black].size }.by(2)
       end
     end
 
@@ -20,7 +20,7 @@ describe Reversi::Player::BasePlayer do
 
     context "when the third argument is `false`" do
       it "makes a opponent's move" do
-        expect{ player.put_disk(:e, 3, false) }.to change{ board.status[:white] }.by(2)
+        expect{ player.put_disk(:e, 3, false) }.to change{ board.status[:white].size }.by(2)
       end
     end
   end
@@ -71,11 +71,8 @@ describe Reversi::Player::BasePlayer do
     end
   end
 
-  describe "#my_disks" do
-    it { expect(player.my_disks).to eq [[:d, 5], [:e, 4]] }
-  end
-
-  describe "#opponent_disks" do
-    it { expect(player.opponent_disks).to eq [[:d, 4], [:e, 5]] }
+  describe "#status" do
+    it { expect(player.status[:mine]).to eq [[:d, 5], [:e, 4]] }
+    it { expect(player.status[:opponent]).to eq [[:d, 4], [:e, 5]] }
   end
 end

@@ -81,17 +81,10 @@ module Reversi
       num.times{ @columns = @stack.pop }
     end
 
-    # Returns a hash containing the number of each color.
-    #
-    # @return [Hash{Symbol => Integer}]
-    def status
-      Hash[*[:none, :black, :white].map{ |key| [key, count_disks(key)] }.flatten]
-    end
-
     # Returns a hash containing the coordinates of each color.
     #
     # @return [Hash{Symbol => Array<Symbol, Integer>}]
-    def detailed_status
+    def status
       Hash[*[:none, :black, :white].map do |key|
         [key, COORDINATES.map{ |x, y| [x, y] if key == at(x, y) }.compact]
       end.flatten(1)]

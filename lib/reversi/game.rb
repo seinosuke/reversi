@@ -28,7 +28,6 @@ module Reversi
     #
     # @see #run
     def start
-      @board.push_stack if @board.stack.size == 0
       options = {:progress => @progress, :vs_human => @vs_human}
       run(options)
     end
