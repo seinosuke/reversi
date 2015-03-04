@@ -8,9 +8,5 @@ require "reversi/game"
 module Reversi
   extend Configuration
 
-  class << self
-    def new(options = {})
-      Reversi::Game.new(options)
-    end
-  end
+  class MoveError < StandardError; end
 end

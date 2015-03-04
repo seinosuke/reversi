@@ -1,10 +1,9 @@
-# coding: utf-8
-
 module Reversi::Player
   class RandomAI < BasePlayer
 
-    def move
-      put_disk(*next_moves.sample) unless next_moves.empty?
+    def move(board)
+      moves = next_moves.map{ |v| v[:move] }
+      put_disk(*moves.sample) unless moves.empty?
     end
   end
 end
