@@ -61,6 +61,8 @@ module Reversi
         show_board if mode[:progress]
       end
       puts @board.to_s if mode[:progress] || mode[:vs_human]
+    rescue Interrupt
+      exit 1
     end
 
     # Show the current state of this game board.
