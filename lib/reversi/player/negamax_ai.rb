@@ -1,5 +1,5 @@
 module Reversi::Player
-  class NegamaxAI < Reversi::Player::BasePlayer
+  class NegamaxAI < BasePlayer
 
     POINT = {
       [:a, 1] => 100, [:b, 1] => -10, [:c, 1] =>  0, [:d, 1] => -1, [:e, 1] => -1, [:f, 1] =>  0, [:g, 1] => -10, [:h, 1] => 100,

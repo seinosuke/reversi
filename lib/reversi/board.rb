@@ -50,7 +50,7 @@ module Reversi
     #
     # @return [String]
     def to_s
-      "     #{(:a..:h).to_a.map(&:to_s).join("   ")}\n" <<
+      "     #{[*'a'..'h'].join("   ")}\n" <<
       "   #{"+---"*8}+\n" <<
       @columns[1][1..-2].zip(*@columns[2..8].map{ |col| col[1..-2] })
       .map{ |row| row.map do |e|
@@ -61,7 +61,7 @@ module Reversi
         end
       end
       .map{ |e| "| #{e} |" }.join }.map{ |e| e.gsub(/\|\|/, "|") }
-      .tap{ |rows| break (0..7).to_a.map{ |i| " #{i+1} " << rows[i] } }
+      .tap{ |rows| break [*0..7].map{ |i| " #{i+1} " << rows[i] } }
       .join("\n   #{"+---"*8}+\n") <<
       "\n   #{"+---"*8}+\n"
     end
@@ -96,7 +96,7 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Integer] the openness
     def openness(x, y)
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       ([-1,0,1].product([-1,0,1]) - [[0, 0]]).inject(0) do |sum, (dx, dy)|
         sum + (@columns[x + dx][y + dy] == 0 ? 1 : 0)
       end
@@ -108,7 +108,7 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Symbol] the color or `:none`
     def at(x, y)
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       DISK.key(@columns[x][y])
     end
 
@@ -139,7 +139,7 @@ module Reversi
     # @param y [Integer] the row number
     # @param color [Symbol]
     def put_disk(x, y, color)
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       @columns[x][y] = DISK[color.to_sym]
     end
 
@@ -150,10 +150,9 @@ module Reversi
     # @param y [Integer] the row number
     # @param color [Symbol]
     def flip_disks(x, y, color)
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       [-1,0,1].product([-1,0,1]).each do |dx, dy|
         next if dx == 0 && dy == 0
-        # 隣接石が異色であったらflippable?でひっくり返せるか（挟まれているか）確認
         if @columns[x + dx][y + dy] == DISK[color]*(-1)
           flip_disk(x, y, dx, dy, color) if flippable?(x, y, dx, dy, color)
         end
@@ -184,7 +183,7 @@ module Reversi
     # @param color [Symbol]
     # @return [Boolean]
     def puttable?(x, y, color)
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       return false if @columns[x][y] != 0
       [-1,0,1].product([-1,0,1]).each do |dx, dy|
         next if dx == 0 && dy == 0
