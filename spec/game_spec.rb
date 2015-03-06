@@ -51,6 +51,18 @@ describe Reversi::Game do
     end
   end
 
+  describe "Reversi.reset" do
+    it "reset all options to the default values" do
+      Reversi.configure{ |config| config.progress = true }
+      game = Reversi::Game.new
+      expect(game.options[:progress]).to eq true
+
+      Reversi.reset
+      game = Reversi::Game.new
+      expect(game.options[:progress]).to eq false
+    end
+  end
+
   describe "from a record of a reversi game" do
     game = Reversi::Game.new
     game.player_b.put_disk(:c, 4); game.player_w.put_disk(:e, 3)
