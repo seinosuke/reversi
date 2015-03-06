@@ -32,13 +32,14 @@ module Reversi
       @options = options
       @stack = []
       [:disk_color_b, :disk_color_w].each do |color|
-        if options[color].is_a?(Symbol) || options[color].is_a?(String)
-          options[color] = DISK_COLOR[options[color].to_sym].to_i
+        if @options[color].is_a?(Symbol) || @options[color].is_a?(String)
+          @options[color] = DISK_COLOR[@options[color].to_sym].to_i
         end
       end
       @columns = (0..9).map{ (0..9).map{ |_| DISK[:none] } }
-      put_disk(4, 4, :white); put_disk(5, 5, :white)
-      put_disk(4, 5, :black); put_disk(5, 4, :black)
+      @options[:initial_position].each do |color, positions|
+        positions.each{ |position| put_disk(*position, color) }
+      end
       @columns.each do |col|
         col[0] = 2; col[-1] = 2
       end.tap do |cols|
@@ -69,6 +70,7 @@ module Reversi
     # Pushes an array of the game board onto a stack.
     # The stack size limit is 3(default).
     def push_stack
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       @stack.push(Marshal.load(Marshal.dump(@columns)))
       @stack.shift if @stack.size > @options[:stack_limit]
     end

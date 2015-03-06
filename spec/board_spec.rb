@@ -8,6 +8,8 @@ describe Reversi::Board do
      :disk_w => "w",
      :disk_color_b => disk_color_b,
      :disk_color_w => disk_color_w,
+     :initial_position => {:black => [[:d, 5], [:e, 4]],
+                           :white => [[:d, 4], [:e, 5]]},
      :progress => false,
      :stack_limit => 3}
   end
