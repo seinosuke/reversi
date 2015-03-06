@@ -48,18 +48,20 @@ Use `Reversi.configure` to configure setting for a reversi game.
 
 `name` description... (default value)  
 
-* `player_b` A player having the first move uses this class object. (Reversi::Player::RandomAI)
-* `player_w` A player having the passive move uses this class object. (Reversi::Player::RandomAI)
-* `disk_b` A string of the black disks. ('b')
-* `disk_w` A string of the black disks. ('w')
-* `disk_color_b` A color of the black disks. (0)
-* `disk_color_w` A color of the black disks. (0)
+* `player_b` A player having the first move uses this class object. ( Reversi::Player::RandomAI )
+* `player_w` A player having the passive move uses this class object. ( Reversi::Player::RandomAI )
+* `disk_b` A string of the black disks. ( 'b' )
+* `disk_w` A string of the black disks. ( 'w' )
+* `disk_color_b` A color of the black disks. ( 0 )
+* `disk_color_w` A color of the black disks. ( 0 )
 * `initial_position` The initial positions of each disk on the board. ( {:black => [[:d, 5], [:e, 4]], :white => [[:d, 4], [:e, 5]]} )
-* `progress` Whether or not the progress of the game is displayed. (false)
-* `stack_limit` The upper limit number of times of use `Reversi::Board#undo!` . (3)
+* `progress` Whether or not the progress of the game is displayed. ( false )
+* `stack_limit` The upper limit number of times of use `Reversi::Board#undo!` . ( 3 )
 
 A string and a color of the disks are reflected on `game.board.to_s` .  
 You can choose from 9 colors, black, red, green, yellow, blue, magenda, cyan, white and gray.  
+
+Using `Reversi.reset` method, you can reset all options to the default values.
 
 ### Human vs Computer
 
@@ -74,7 +76,7 @@ game = Reversi::Game.new
 game.start
 ```
 
-### My AI
+### Your Original Player
 
 You can make your original player class by inheriting `Reversi::Player::BasePlayer` and defining `move` method.  
 
