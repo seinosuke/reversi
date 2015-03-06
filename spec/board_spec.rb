@@ -8,6 +8,8 @@ describe Reversi::Board do
      :disk_w => "w",
      :disk_color_b => disk_color_b,
      :disk_color_w => disk_color_w,
+     :initial_position => {:black => [[:d, 5], [:e, 4]],
+                           :white => [[:d, 4], [:e, 5]]},
      :progress => false,
      :stack_limit => 3}
   end
@@ -30,6 +32,35 @@ describe Reversi::Board do
         expect(board.options[:disk_color_b]).to eq 0
         expect(board.options[:disk_color_w]).to eq 0
       end
+    end
+  end
+
+  describe "#to_s" do
+    let(:disk_color_b) { :black }
+    let(:disk_color_w) { 'white' }
+
+    it do
+      str = <<-END.gsub(/ {6}/,"")
+           a   b   c   d   e   f   g   h
+         +---+---+---+---+---+---+---+---+
+       1 |   |   |   |   |   |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       2 |   |   |   |   |   |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       3 |   |   |   |   |   |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       4 |   |   |   | \e[37mw\e[0m | \e[30mb\e[0m |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       5 |   |   |   | \e[30mb\e[0m | \e[37mw\e[0m |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       6 |   |   |   |   |   |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       7 |   |   |   |   |   |   |   |   |
+         +---+---+---+---+---+---+---+---+
+       8 |   |   |   |   |   |   |   |   |
+         +---+---+---+---+---+---+---+---+
+      END
+      expect(board.to_s).to eq str
     end
   end
 

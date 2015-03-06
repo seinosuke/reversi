@@ -8,9 +8,22 @@ module Reversi
       :disk_w,
       :disk_color_b,
       :disk_color_w,
+      :initial_position,
       :progress,
       :stack_limit
     ].freeze
+
+    DEFAULTS = {
+      :player_b => Reversi::Player::RandomAI,
+      :player_w => Reversi::Player::RandomAI,
+      :disk_b => 'b',
+      :disk_w => 'w',
+      :disk_color_b => 0,
+      :disk_color_w => 0,
+      :initial_position => {:black => [[:d, 5], [:e, 4]], :white => [[:d, 4], [:e, 5]]},
+      :progress => false,
+      :stack_limit => 3
+    }
 
     attr_accessor *OPTIONS_KEYS
 
@@ -22,15 +35,18 @@ module Reversi
       Hash[*OPTIONS_KEYS.map{|key| [key, send(key)]}.flatten]
     end
 
+    def reset
+      DEFAULTS.each do |option, default|
+        self.send("#{option}=".to_sym, default)
+      end
+    end
+
     def set_defaults
-      self.player_b     ||= Reversi::Player::RandomAI
-      self.player_w     ||= Reversi::Player::RandomAI
-      self.disk_b       ||= "b"
-      self.disk_w       ||= "w"
-      self.disk_color_b ||= 0
-      self.disk_color_w ||= 0
-      self.progress     ||= false
-      self.stack_limit  ||= 3
+      DEFAULTS.each do |option, default|
+        default.class == String ?
+        eval("self.#{option} ||= \'#{default}\'") :
+        eval("self.#{option} ||= #{default}")
+      end
     end
   end
 end

@@ -23,10 +23,7 @@ module Reversi::Player
       @board.push_stack
       color = my_color ? @my_color : @opponent_color
       x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
-      diff = flip_disks(x, y, color)
-      if diff.empty?
-        raise Reversi::MoveError, "A player must flip at least one or more opponent's disks."
-      end
+      flip_disks(x, y, color)
       @board.put_disk(x, y, color)
     end
 

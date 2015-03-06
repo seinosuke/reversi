@@ -12,12 +12,6 @@ describe Reversi::Player::BasePlayer do
       end
     end
 
-    context "when a player make an invalid move" do
-      it "Reversi::MoveError raised" do
-        expect{ player.put_disk(:a, 1) }.to raise_error Reversi::MoveError
-      end
-    end
-
     context "when the third argument is `false`" do
       it "makes a opponent's move" do
         expect{ player.put_disk(:e, 3, false) }.to change{ board.status[:white].size }.by(2)
