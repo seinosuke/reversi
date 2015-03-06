@@ -54,6 +54,7 @@ Use `Reversi.configure` to configure setting for a reversi game.
 * `disk_w` A string of the black disks. ('w')
 * `disk_color_b` A color of the black disks. (0)
 * `disk_color_w` A color of the black disks. (0)
+* `initial_position` The initial positions of each disk on the board. ( {:black => [[:d, 5], [:e, 4]], :white => [[:d, 4], [:e, 5]]} )
 * `progress` Whether or not the progress of the game is displayed. (false)
 * `stack_limit` The upper limit number of times of use `Reversi::Board#undo!` . (3)
 

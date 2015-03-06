@@ -34,6 +34,23 @@ describe Reversi::Game do
     end
   end
 
+  describe "initial position" do
+    it "default" do
+      game = Reversi::Game.new
+      expect(game.board.at(:e, 4)).to eq :black
+      expect(game.board.at(:d, 4)).to eq :white
+    end
+
+    it "original position" do
+      initial = {:black => [[:a, 1]], :white => [[:h, 8]]}
+      options = {:initial_position => initial}
+      game = Reversi::Game.new(options)
+      expect(game.board.at(:d, 4)).to eq :none
+      expect(game.board.at(:a, 1)).to eq :black
+      expect(game.board.at(:h, 8)).to eq :white
+    end
+  end
+
   describe "from a record of a reversi game" do
     game = Reversi::Game.new
     game.player_b.put_disk(:c, 4); game.player_w.put_disk(:e, 3)
