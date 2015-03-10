@@ -1,6 +1,6 @@
-#include "board_ext.h"
+#include "reversi.h"
 
-void Init_board(void) {
+void Init_reversi(void) {
   VALUE reversi = rb_define_module("Reversi");
   VALUE reversi_board = rb_define_class_under(reversi, "Board", rb_cObject);
 
