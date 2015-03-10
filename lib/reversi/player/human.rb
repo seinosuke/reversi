@@ -18,7 +18,7 @@ module Reversi::Player
         @input_move = gets.chomp.split("")
         exit if [['q'], ['e','x','i','t']].include? @input_move
         redo if check_size == :redo
-        @input_move[0] = @input_move[0].to_sym
+        @input_move[0] = [*:a..:h].index(@input_move[0].to_sym) + 1
         @input_move[1] = @input_move[1].to_i
         printf "\e[#{1}A"; STDOUT.flush
         print "#{" "*9}"
