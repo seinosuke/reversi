@@ -188,12 +188,13 @@ static VALUE board_flip_disks(VALUE self, VALUE x, VALUE y, VALUE color) {
   Data_Get_Struct(self, struct board, ptr);
   x = FIX2INT(x);
   y = FIX2INT(y);
+  color = FIX2INT(color);
 
   for(dx = -1; dx < 2; dx++){
     for(dy = -1; dy < 2; dy++){
       if (dx == 0 && dy == 0) continue;
       if (ptr->columns[x + dx][y + dy] == (signed)(-color) &&
-         can_flip(self, x, y, dx, dy, color == 1))
+         can_flip(self, x, y, dx, dy, color) == 1)
         flip_disk(self, x, y, dx, dy, color);
     }
   }
@@ -217,6 +218,8 @@ int can_put(VALUE self, int x, int y, int color){
   int dx, dy;
   struct board *ptr;
   Data_Get_Struct(self, struct board, ptr);
+
+  if (ptr->columns[x][y] != 0) return 0;
 
   for(dx = -1; dx < 2; dx++){
     for(dy = -1; dy < 2; dy++){

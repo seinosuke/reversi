@@ -91,13 +91,6 @@ describe Reversi::Board do
         expect{ board.undo! }.to change{ board.stack.size }.by(-1)
       end
     end
-
-    context "when the first argument is supplied" do
-      it "the number is used" do
-        3.times { board.push_stack }
-        expect{ board.undo! 2 }.to change{ board.stack.size }.by(-2)
-      end
-    end
   end
 
   describe "#status" do
@@ -149,8 +142,8 @@ describe Reversi::Board do
   describe "#next_moves" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it { expect(board.next_moves(:black)).to eq [[:c, 4], [:d, 3], [:e, 6], [:f, 5]] }
-    it { expect(board.next_moves(:white)).to eq [[:c, 5], [:d, 6], [:e, 3], [:f, 4]] }
+    it { expect(board.next_moves(:black)).to eq [[3, 4], [4, 3], [5, 6], [6, 5]] }
+    it { expect(board.next_moves(:white)).to eq [[3, 5], [4, 6], [5, 3], [6, 4]] }
   end
 
   describe "#put_disk, #flip_disks" do
