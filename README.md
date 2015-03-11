@@ -99,8 +99,8 @@ game = Reversi::Game.new
 game.start
 ```
 
- * Example of Negamax Algorithm  
-Please see `Reversi::Player::NegamaxAI` .
+ * Example of NegaMax Algorithm  
+Please see `Reversi::Player::NegaMaxAI` .
 
 ## Contributing
 
