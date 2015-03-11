@@ -1,6 +1,6 @@
 # Reversi
 
-[![Gem Version](https://badge.fury.io/rb/reversi.svg)](http://badge.fury.io/rb/reversi)  
+[![Gem Version](https://badge.fury.io/rb/reversi.svg)](http://badge.fury.io/rb/reversi) [![Build Status](https://travis-ci.org/seinosuke/reversi.svg?branch=master)](https://travis-ci.org/seinosuke/reversi)  
 A Ruby Gem to play reversi game. You can enjoy a game on the command line or easily make your original reversi game programs.  
 
 ![reversi.gif](https://github.com/seinosuke/reversi/blob/master/images/reversi.gif)

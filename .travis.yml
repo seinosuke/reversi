@@ -5,8 +5,7 @@ rvm:
   - 2.0.0
   - 2.1.0
 
-bundler_args: --without development --deployment --jobs=2
-cache: bundler
+bundler_args: --without development --jobs=2
 
 script: bundle exec rspec
 
