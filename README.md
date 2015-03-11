@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/reversi.svg)](http://badge.fury.io/rb/reversi)  
 A Ruby Gem to play reversi game. You can enjoy a game on the command line or easily make your original reversi game programs.  
 
-![reversi](https://github.com/seinosuke/reversi/blob/master/images/reversi.gif)
+![reversi.gif](https://github.com/seinosuke/reversi/blob/master/images/reversi.gif)
 
 ## Installation
 
@@ -55,7 +55,7 @@ Use `Reversi.configure` to configure setting for a reversi game.
 * `disk_color_w` A color of the black disks. ( 0 )
 * `initial_position` The initial positions of each disk on the board. ( {:black => [[:d, 5], [:e, 4]], :white => [[:d, 4], [:e, 5]]} )
 * `progress` Whether or not the progress of the game is displayed. ( false )
-* `stack_limit` The upper limit number of times of use `Reversi::Board#undo!` . ( 3 )
+* `stack_limit` The upper limit number of times of use repeatedly `Reversi::Board#undo!` . ( 3 )
 
 A string and a color of the disks are reflected on `game.board.to_s` .  
 You can choose from 9 colors, black, red, green, yellow, blue, magenda, cyan, white and gray.  
@@ -99,8 +99,8 @@ game = Reversi::Game.new
 game.start
 ```
 
- * Example of Negamax Algorithm  
-Please see `Reversi::Player::NegamaxAI` .
+ * Other examples of algorithm  
+Please see [Reversi::Player::MinMaxAI](https://github.com/seinosuke/reversi/blob/master/lib/reversi/player/min_max_ai.rb) or [Reversi::Player::NegaMaxAI](https://github.com/seinosuke/reversi/blob/master/lib/reversi/player/nega_max_ai.rb) . These are examples of the player that can read the next three moves and evaluate a game state based on the positions of the disks. If you want to read the next more than three moves, set `stack_limit` to the number.
 
 ## Contributing
 
