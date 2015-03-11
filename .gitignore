@@ -13,4 +13,3 @@
 *.o
 *.a
 mkmf.log
-.travis.yml
