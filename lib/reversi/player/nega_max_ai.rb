@@ -4,7 +4,7 @@ module Reversi::Player
     def initialize(_color, _board)
       super
 
-      point = [
+      points = [
         100, -10,  0, -1, -1,  0, -10, 100,
         -10, -30, -5, -5, -5, -5, -30, -10,
           0,  -5,  0, -1, -1,  0,  -5,   0,
@@ -15,17 +15,15 @@ module Reversi::Player
         100, -10,  0, -1, -1,  0, -10, 100
       ]
       @evaluation_value = 
-        Hash[(1..8).map{ |x| (1..8).map{ |y| [[x, y], point.shift] } }.flatten(1) ]
+        Hash[(1..8).map{ |x| (1..8).map{ |y| [[x, y], points.shift] } }.flatten(1) ]
     end
 
     def move(board)
       moves = next_moves.map{ |v| v[:move] }
       return if moves.empty?
-
       next_move = moves.map do |move|
-        { :move => move, :point => evaluate(move, board, 1, true) }
-      end
-      .max_by{ |v| v[:point] }[:move]
+        { :move => move, :point => evaluate(move, board, 3, true) }
+      end.max_by{ |v| v[:point] }[:move]
       put_disk(*next_move)
     end
 
@@ -33,12 +31,12 @@ module Reversi::Player
       put_disk(*move, color)
       moves = next_moves(!color).map{ |v| v[:move] }
 
-      if depth == 3
+      if depth == 1
         status[:mine].inject(0){ |sum, xy| sum + @evaluation_value[xy] }
       elsif moves.empty?
         -100
       else
-        -( moves.map{ |move| evaluate(move, board, depth + 1, !color) }.max )
+        -( moves.map{ |move| evaluate(move, board, depth - 1, !color) }.max )
       end
 
     ensure
