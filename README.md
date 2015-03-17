@@ -53,7 +53,7 @@ Use `Reversi.configure` to configure setting for a reversi game.
 * `disk_w` A string of the black disks. ( 'w' )
 * `disk_color_b` A color of the black disks. ( 0 )
 * `disk_color_w` A color of the black disks. ( 0 )
-* `initial_position` The initial positions of each disk on the board. ( {:black => [[:d, 5], [:e, 4]], :white => [[:d, 4], [:e, 5]]} )
+* `initial_position` The initial positions of each disk on the board. ( {:black => [[4, 5], [5, 4]], :white => [[4, 4], [5, 5]]} )
 * `progress` Whether or not the progress of the game is displayed. ( false )
 * `stack_limit` The upper limit number of times of use repeatedly `Reversi::Board#undo!` . ( 3 )
 
@@ -81,7 +81,7 @@ game.start
 
 You can make your original player class by inheriting `Reversi::Player::BasePlayer` and defining `move` method.  
 
-`next_moves` method returns an array of the next moves information. A player places a supplied color's disk on specified position, and flips the opponent's disks by using `put_disk` method. You can get the current game board state from a `board` variable.
+`next_moves` method returns an array of the next moves information. A player places a supplied color's disk on specified position, and flips the opponent's disks by using `put_disk` method. You can get the current game board state from a `board` variable or `status` method.
 
  * **Example of Random Player**
 
@@ -110,7 +110,7 @@ class MyAI < Reversi::Player::BasePlayer
     super
 
     # The evaluation value at each position.
-    point = [
+    points = [
       100, -10,  0, -1, -1,  0, -10, 100,
       -10, -30, -5, -5, -5, -5, -30, -10,
         0,  -5,  0, -1, -1,  0,  -5,   0,
@@ -121,7 +121,7 @@ class MyAI < Reversi::Player::BasePlayer
       100, -10,  0, -1, -1,  0, -10, 100
     ]
     @evaluation_value = 
-      Hash[(1..8).map{ |x| (1..8).map{ |y| [[x, y], point.shift] } }.flatten(1) ]
+      Hash[(1..8).map{ |x| (1..8).map{ |y| [[x, y], points.shift] } }.flatten(1) ]
   end
 
   def move(board)

@@ -20,7 +20,7 @@ module Reversi
       :disk_w => 'w',
       :disk_color_b => 0,
       :disk_color_w => 0,
-      :initial_position => {:black => [[:d, 5], [:e, 4]], :white => [[:d, 4], [:e, 5]]},
+      :initial_position => {:black => [[4, 5], [5, 4]], :white => [[4, 4], [5, 5]]},
       :progress => false,
       :stack_limit => 3
     }

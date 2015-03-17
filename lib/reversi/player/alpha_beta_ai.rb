@@ -6,7 +6,7 @@ module Reversi::Player
     def initialize(_color, _board)
       super
 
-      point = [
+      points = [
         100, -10,  0, -1, -1,  0, -10, 100,
         -10, -30, -5, -5, -5, -5, -30, -10,
           0,  -5,  0, -1, -1,  0,  -5,   0,
@@ -17,7 +17,7 @@ module Reversi::Player
         100, -10,  0, -1, -1,  0, -10, 100
       ]
       @evaluation_value = 
-        Hash[(1..8).map{ |x| (1..8).map{ |y| [[x, y], point.shift] } }.flatten(1) ]
+        Hash[(1..8).map{ |x| (1..8).map{ |y| [[x, y], points.shift] } }.flatten(1) ]
     end
 
     def move(board)
