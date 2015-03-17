@@ -1,16 +1,31 @@
 #include "reversi.h"
 
+struct stack{
+  int stack_columns[10][10];
+  struct stack *next;
+};
+
+struct stack *head = NULL;
+
+struct board {
+  int columns[10][10];
+};
+
 void Init_reversi(void) {
   VALUE reversi = rb_define_module("Reversi");
   VALUE reversi_board = rb_define_class_under(reversi, "Board", rb_cObject);
 
   rb_define_alloc_func(reversi_board, board_alloc);
 
-  rb_define_private_method(reversi_board, "board_initialize", board_initialize, 0);
+  /* The getter method for a Reversi::Board object. */
   rb_define_method(reversi_board, "columns", board_columns_getter, 0);
   rb_define_method(reversi_board, "stack", board_stack_getter, 0);
+
+  /* The instance method for a Reversi::Board object. */
   rb_define_method(reversi_board, "undo!", board_undo, 0);
 
+  /* These private methods are used in the board.rb file. */
+  rb_define_private_method(reversi_board, "board_initialize", board_initialize, 0);
   rb_define_private_method(reversi_board, "board_push_stack", board_push_stack, 1);
   rb_define_private_method(reversi_board, "board_status", board_status, 0);
   rb_define_private_method(reversi_board, "board_openness", board_openness, 2);
@@ -19,6 +34,11 @@ void Init_reversi(void) {
   rb_define_private_method(reversi_board, "board_next_moves", board_next_moves, 1);
   rb_define_private_method(reversi_board, "board_put_disk", board_put_disk, 3);
   rb_define_private_method(reversi_board, "board_flip_disks", board_flip_disks, 3);
+}
+
+static VALUE board_alloc(VALUE class) {
+  struct board *ptr = ALLOC(struct board);
+  return Data_Wrap_Struct(class, 0, -1, ptr);
 }
 
 static VALUE board_initialize(VALUE self) {
@@ -39,6 +59,11 @@ static VALUE board_initialize(VALUE self) {
   return Qnil;
 }
 
+/*
+ * The getter method for the instance variable `columns`.
+ *
+ * @return [Array]
+ */
 static VALUE board_columns_getter(VALUE self) {
   VALUE column = rb_ary_new();
   VALUE columns = rb_ary_new();
@@ -54,6 +79,11 @@ static VALUE board_columns_getter(VALUE self) {
   return columns;
 }
 
+/*
+ * The getter method for the instance variable `stack`.
+ *
+ * @return [Array]
+ */
 static VALUE board_stack_getter(VALUE self) {
   VALUE stack = rb_ary_new();
   VALUE column = rb_ary_new();
@@ -73,6 +103,10 @@ static VALUE board_stack_getter(VALUE self) {
   return stack;
 }
 
+/*
+ * Pops an array of the game board off of the stack,
+ * and that is stored in the instance variable `columns`.
+ */
 static VALUE board_undo(VALUE self) {
   struct board *ptr;
   Data_Get_Struct(self, struct board, ptr);
@@ -80,11 +114,22 @@ static VALUE board_undo(VALUE self) {
   return Qnil;
 }
 
+/*
+ * Pushes an array of the game board onto a stack.
+ *
+ * @param limit [Integer] An upper limit size of the stack.
+ */
 static VALUE board_push_stack(VALUE self, VALUE limit) {
   push_stack(self, FIX2INT(limit));
   return Qnil;
 }
 
+/*
+ * Returns an array containing the coordinates of each color.
+ * The arrays are stored `black`, `while`, and `none` in that order.
+ *
+ * @return [Array]
+ */
 static VALUE board_status(VALUE self) {
   VALUE black = rb_ary_new();
   VALUE white = rb_ary_new();
@@ -123,6 +168,13 @@ static VALUE board_status(VALUE self) {
   return status;
 }
 
+/*
+ * Returns the openness of the coordinates.
+ *
+ * @param x [Integer] the column number
+ * @param y [Integer] the row number
+ * @return [Integer] the openness
+ */
 static VALUE board_openness(VALUE self, VALUE x, VALUE y) {
   int dx, dy, sum = 0;
   struct board *ptr;
@@ -137,12 +189,25 @@ static VALUE board_openness(VALUE self, VALUE x, VALUE y) {
   return INT2FIX(sum);
 }
 
+/*
+ * Returns the disk color of supplied coordinates.
+ *
+ * @param x [Integer] the column number
+ * @param y [Integer] the row number
+ * @return [Integer] `black`: -1, `white`: 1, `none`: 0
+ */
 static VALUE board_at(VALUE self, VALUE x, VALUE y) {
   struct board *ptr;
   Data_Get_Struct(self, struct board, ptr);
   return INT2FIX(ptr->columns[FIX2INT(x)][FIX2INT(y)]);
 }
 
+/*
+ * Counts the number of the supplied color's disks.
+ *
+ * @param color [Integer] `black`: -1, `white`: 1, `none`: 0
+ * @return [Integer] the sum of the counted disks
+ */
 static VALUE board_count_disks(VALUE self, VALUE color) {
   int x, y, count = 0;
   struct board *ptr;
@@ -156,6 +221,12 @@ static VALUE board_count_disks(VALUE self, VALUE color) {
   return INT2FIX(count);
 }
 
+/*
+ * Returns an array of the next moves.
+ *
+ * @param color [Integer] `black`: -1, `white`: 1, `none`: 0
+ * @return [Array] the next moves
+ */
 static VALUE board_next_moves(VALUE self, VALUE color) {
   int x, y;
   VALUE move = rb_ary_new();
@@ -174,6 +245,13 @@ static VALUE board_next_moves(VALUE self, VALUE color) {
   return moves;
 }
 
+/*
+ * Places a supplied color's disk on specified position.
+ *
+ * @param x [Integer] the column number
+ * @param y [Integer] the row number
+ * @param color [Integer] `black`: -1, `white`: 1, `none`: 0
+ */
 static VALUE board_put_disk(VALUE self, VALUE x, VALUE y, VALUE color) {
   struct board *ptr;
   Data_Get_Struct(self, struct board, ptr);
@@ -182,6 +260,14 @@ static VALUE board_put_disk(VALUE self, VALUE x, VALUE y, VALUE color) {
   return Qnil;
 }
 
+/*
+ * Flips the opponent's disks between a new disk and another disk of my color.
+ * The invalid move has no effect.
+ *
+ * @param x [Integer] the column number
+ * @param y [Integer] the row number
+ * @param color [Integer] `black`: -1, `white`: 1, `none`: 0
+ */
 static VALUE board_flip_disks(VALUE self, VALUE x, VALUE y, VALUE color) {
   int dx, dy;
   struct board *ptr;
@@ -201,6 +287,10 @@ static VALUE board_flip_disks(VALUE self, VALUE x, VALUE y, VALUE color) {
   return Qnil;
 }
 
+/*
+ * Flips the opponent's disks on one of these straight lines
+ * between a new disk and another disk of my color.
+ */
 void flip_disk(VALUE self, int x, int y, int dx, int dy, int color){
   struct board *ptr;
   Data_Get_Struct(self, struct board, ptr);
@@ -214,6 +304,10 @@ void flip_disk(VALUE self, int x, int y, int dx, int dy, int color){
   return;
 }
 
+/*
+ * Whether or not a player can place a new disk on specified position.
+ * Returns `1` if the move is valid.
+ */
 int can_put(VALUE self, int x, int y, int color){
   int dx, dy;
   struct board *ptr;
@@ -232,6 +326,9 @@ int can_put(VALUE self, int x, int y, int color){
   return 0;
 }
 
+/*
+ * Whether or not a player can flip the opponent's disks.
+ */
 int can_flip(VALUE self, int x, int y, int dx, int dy, int color){
   struct board *ptr;
   Data_Get_Struct(self, struct board, ptr);

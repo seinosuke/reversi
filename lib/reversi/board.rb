@@ -120,7 +120,7 @@ module Reversi
     end
 
     # Flips the opponent's disks between a new disk and another disk of my color.
-    # the invalid move has no effect.
+    # The invalid move has no effect.
     #
     # @param x [Symbol, Integer] the column number
     # @param y [Integer] the row number

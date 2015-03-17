@@ -3,6 +3,7 @@
 #include <memory.h>
 
 void Init_board(void);
+
 static VALUE board_alloc(VALUE class);
 static VALUE board_initialize(VALUE self);
 static VALUE board_columns_getter(VALUE self);
@@ -26,18 +27,3 @@ void pop_stack(int ary[10][10]);
 int stack_size(void);
 void delete_old(void);
 void reset_stack(void);
-
-struct stack{
-  int stack_columns[10][10];
-  struct stack *next;
-};
-struct stack *head = NULL;
-
-struct board {
-  int columns[10][10];
-};
-
-static VALUE board_alloc(VALUE class) {
-  struct board *ptr = ALLOC(struct board);
-  return Data_Wrap_Struct(class, 0, -1, ptr);
-}
