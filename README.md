@@ -1,6 +1,6 @@
 # Reversi
 
-[![Gem Version](https://badge.fury.io/rb/reversi.svg)](http://badge.fury.io/rb/reversi) [![Build Status](https://travis-ci.org/seinosuke/reversi.svg?branch=master)](https://travis-ci.org/seinosuke/reversi)  
+[![Gem Version](https://badge.fury.io/rb/reversi.svg)](http://badge.fury.io/rb/reversi) [![Build Status](https://travis-ci.org/seinosuke/reversi.svg?branch=master)](https://travis-ci.org/seinosuke/reversi) [![Inline docs](http://inch-ci.org/github/seinosuke/reversi.svg?branch=master)](http://inch-ci.org/github/seinosuke/reversi)  
 A Ruby Gem to play reversi game. You can enjoy a game on the command line or easily make your original reversi game programs.  
 
 ![reversi.gif](https://github.com/seinosuke/reversi/blob/master/images/reversi.gif)
@@ -53,12 +53,14 @@ Use `Reversi.configure` to configure setting for a reversi game.
 * `disk_w` A string of the black disks. ( 'w' )
 * `disk_color_b` A color of the black disks. ( 0 )
 * `disk_color_w` A color of the black disks. ( 0 )
-* `initial_position` The initial positions of each disk on the board. ( {:black => [[4, 5], [5, 4]], :white => [[4, 4], [5, 5]]} )
+* `initial_position` The initial positions of each disk on the board.
 * `progress` Whether or not the progress of the game is displayed. ( false )
 * `stack_limit` The upper limit number of times of use repeatedly `Reversi::Board#undo!` . ( 3 )
 
 A string and a color of the disks are reflected on `game.board.to_s` .  
 You can choose from 9 colors, black, red, green, yellow, blue, magenda, cyan, white and gray.  
+
+The default of `initial_position` is `{:black => [[4, 5], [5, 4]], :white => [[4, 4], [5, 5]]}` .
 
 Using `Reversi.reset` method, you can reset all options to the default values.
 
