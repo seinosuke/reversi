@@ -28,12 +28,18 @@ module Reversi
     # @return [Reversi::Board]
     def initialize(options = {})
       @options = options
+      @stack = []
+      @bit_board = {
+        :black => 0x0004_0000_8100_0124,
+        :white => 0x0000_0416_7A0E_1400
+      }
+
       [:disk_color_b, :disk_color_w].each do |color|
         if @options[color].is_a?(Symbol) || @options[color].is_a?(String)
           @options[color] = DISK_COLOR[@options[color].to_sym].to_i
         end
       end
-      board_initialize
+
       @options[:initial_position].each do |color, positions|
         positions.each{ |position| put_disk(*position, color) }
       end
@@ -45,16 +51,16 @@ module Reversi
     def to_s
       "     #{[*'a'..'h'].join("   ")}\n" <<
       "   #{"+---"*8}+\n" <<
-      columns[1][1..-2].zip(*columns[2..8].map{ |col| col[1..-2] })
-      .map{ |row| row.map do |e|
-        case e
-        when  0 then " "
-        when -1 then "\e[#{@options[:disk_color_b]}m#{@options[:disk_b]}\e[0m"
-        when  1 then "\e[#{@options[:disk_color_w]}m#{@options[:disk_w]}\e[0m"
+      (0..63).map do |i|
+        case 1
+        when @bit_board[:black][63 - i] then "\e[#{@options[:disk_color_b]}m#{@options[:disk_b]}\e[0m"
+        when @bit_board[:white][63 - i] then "\e[#{@options[:disk_color_w]}m#{@options[:disk_w]}\e[0m"
+        else " "
         end
       end
-      .map{ |e| "| #{e} |" }.join }.map{ |e| e.gsub(/\|\|/, "|") }
-      .tap{ |rows| break [*0..7].map{ |i| " #{i+1} " << rows[i] } }
+      .map{ |e| "| #{e} |" }.each_slice(8).map(&:join)
+      .map{ |line| line.gsub(/\|\|/, "|") }
+      .tap{ |lines| break (0..7).map{ |i| " #{i+1} #{lines[i]}" } }
       .join("\n   #{"+---"*8}+\n") <<
       "\n   #{"+---"*8}+\n"
     end
@@ -62,14 +68,37 @@ module Reversi
     # Pushes an array of the game board onto a stack.
     # The stack size limit is 3(default).
     def push_stack
-      board_push_stack(@options[:stack_limit])
+      @stack.push(Marshal.load(Marshal.dump(@bit_board)))
+      @stack.shift if @stack.size > @options[:stack_limit]
+    end
+
+    def undo!
+      @bit_board = @stack.pop
     end
 
     # Returns a hash containing the coordinates of each color.
     #
     # @return [Hash{Symbol => Array<Symbol, Integer>}]
     def status
-      ary = board_status
+      ary = [[], [], []]
+      black = @bit_board[:black]
+      white = @bit_board[:white]
+      blank = ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
+      while black != 0 do
+        p = black & (~black + 1) & 0xFFFF_FFFF_FFFF_FFFF
+        ary[0] << bb_to_xy(p)
+        black ^= p
+      end
+      while white != 0 do
+        p = white & (~white + 1) & 0xFFFF_FFFF_FFFF_FFFF
+        ary[1] << bb_to_xy(p)
+        white ^= p
+      end
+      while blank != 0 do
+        p = blank & (~blank + 1) & 0xFFFF_FFFF_FFFF_FFFF
+        ary[2] << bb_to_xy(p)
+        blank ^= p
+      end
       {:black => ary[0], :white => ary[1], :none => ary[2]}
     end
 
@@ -79,8 +108,8 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Integer] the openness
     def openness(x, y)
-      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
-      board_openness(x, y)
+      # x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
+      # board_openness(x, y)
     end
 
     # Returns the color of supplied coordinates.
@@ -89,8 +118,8 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Symbol] the color or `:none`
     def at(x, y)
-      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
-      DISK.key(board_at(x, y))
+      # x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
+      # DISK.key(board_at(x, y))
     end
 
     # Counts the number of the supplied color's disks.
@@ -98,7 +127,16 @@ module Reversi
     # @param color [Symbol]
     # @return [Integer] the sum of the counted disks
     def count_disks(color)
-      board_count_disks(DISK[color])
+      bb = case color
+        when :black then @bit_board[:black]
+        when :white then @bit_board[:white]
+      end
+      bb = (bb & 0x5555_5555_5555_5555) + (bb >> 1  & 0x5555_5555_5555_5555)
+      bb = (bb & 0x3333_3333_3333_3333) + (bb >> 2  & 0x3333_3333_3333_3333)
+      bb = (bb & 0x0F0F_0F0F_0F0F_0F0F) + (bb >> 4  & 0x0F0F_0F0F_0F0F_0F0F)
+      bb = (bb & 0x00FF_00FF_00FF_00FF) + (bb >> 8  & 0x00FF_00FF_00FF_00FF)
+      bb = (bb & 0x0000_FFFF_0000_FFFF) + (bb >> 16 & 0x0000_FFFF_0000_FFFF)
+           (bb & 0x0000_0000_FFFF_FFFF) + (bb >> 32 & 0x0000_0000_FFFF_FFFF)
     end
 
     # Returns an array of the next moves.
@@ -106,7 +144,18 @@ module Reversi
     # @param color [Symbol]
     # @return [Array<Array<Symbol, Integer>>]
     def next_moves(color)
-      board_next_moves(DISK[color])
+      my, op = case color
+        when :black then [@black, @white]
+        when :white then [@white, @black]
+      end
+      pos = horizontal_pos(my, op) | vertical_pos(my, op) | diagonal_pos(my, op)
+      moves = []
+      while pos != 0 do
+        p = pos & (~pos + 1) & 0xFFFF_FFFF_FFFF_FFFF
+        moves << bb_to_xy(p)
+        pos ^= p
+      end
+      moves
     end
 
     # Places a supplied color's disk on specified position.
@@ -116,7 +165,11 @@ module Reversi
     # @param color [Symbol]
     def put_disk(x, y, color)
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
-      board_put_disk(x, y, DISK[color])
+      p = xy_to_bb(x, y)
+      case color
+      when :black then @black ^= p
+      when :white then @white ^= p
+      end
     end
 
     # Flips the opponent's disks between a new disk and another disk of my color.
@@ -127,7 +180,181 @@ module Reversi
     # @param color [Symbol]
     def flip_disks(x, y, color)
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
-      board_flip_disks(x, y, DISK[color])
+      p = xy_to_bb(x, y)
+      rev = get_rev(x, y, color)
+      case color
+      when :black
+        @black ^= p | rev
+        @white ^= rev
+      when :white
+        @white ^= p | rev
+        @black ^= rev
+      end
+    end
+
+    private
+
+    def xy_to_bb(x = 1, y = 1)
+      1 << ((8 - x) + (8 - y) * 8)
+    end
+
+    def bb_to_xy(bb)
+      x = 8 - (Math.log(bb, 2).to_i % 8)
+      y = 8 - (Math.log(bb, 2).to_i / 8)
+      [x, y]
+    end
+
+    def rotate_r90(bb)
+      bb = ((bb <<  8) & 0xAA00_AA00_AA00_AA00) |
+           ((bb >>  8) & 0x0055_0055_0055_0055) |
+           ((bb <<  1) & 0x00AA_00AA_00AA_00AA) |
+           ((bb >>  1) & 0x5500_5500_5500_5500)
+      bb = ((bb << 16) & 0xCCCC_0000_CCCC_0000) |
+           ((bb >> 16) & 0x0000_3333_0000_3333) |
+           ((bb <<  2) & 0x0000_CCCC_0000_CCCC) |
+           ((bb >>  2) & 0x3333_0000_3333_0000)
+      bb = ((bb << 32) & 0xF0F0_F0F0_0000_0000) |
+           ((bb >> 32) & 0x0000_0000_0F0F_0F0F) |
+           ((bb <<  4) & 0x0000_0000_F0F0_F0F0) |
+           ((bb >>  4) & 0x0F0F_0F0F_0000_0000)
+      bb
+    end
+
+    def rotate_l90(bb)
+      bb = ((bb <<  1) & 0xAA00_AA00_AA00_AA00) |
+           ((bb >>  1) & 0x0055_0055_0055_0055) |
+           ((bb >>  8) & 0x00AA_00AA_00AA_00AA) |
+           ((bb <<  8) & 0x5500_5500_5500_5500)
+      bb = ((bb <<  2) & 0xCCCC_0000_CCCC_0000) |
+           ((bb >>  2) & 0x0000_3333_0000_3333) |
+           ((bb >> 16) & 0x0000_CCCC_0000_CCCC) |
+           ((bb << 16) & 0x3333_0000_3333_0000)
+      bb = ((bb <<  4) & 0xF0F0_F0F0_0000_0000) |
+           ((bb >>  4) & 0x0000_0000_0F0F_0F0F) |
+           ((bb >> 32) & 0x0000_0000_F0F0_F0F0) |
+           ((bb << 32) & 0x0F0F_0F0F_0000_0000)
+      bb
+    end
+
+    def rotate_r45(bb)
+      (bb & 0x0101_0101_0101_0101) |
+      (((bb <<  8) | (bb >> 56) & 0xFFFF_FFFF_FFFF_FFFF) & 0x0202_0202_0202_0202) |
+      (((bb << 16) | (bb >> 48) & 0xFFFF_FFFF_FFFF_FFFF) & 0x0404_0404_0404_0404) |
+      (((bb << 24) | (bb >> 40) & 0xFFFF_FFFF_FFFF_FFFF) & 0x0808_0808_0808_0808) |
+      (((bb << 32) | (bb >> 32) & 0xFFFF_FFFF_FFFF_FFFF) & 0x1010_1010_1010_1010) |
+      (((bb << 40) | (bb >> 24) & 0xFFFF_FFFF_FFFF_FFFF) & 0x2020_2020_2020_2020) |
+      (((bb << 48) | (bb >> 16) & 0xFFFF_FFFF_FFFF_FFFF) & 0x4040_4040_4040_4040) |
+      (((bb << 56) | (bb >>  8) & 0xFFFF_FFFF_FFFF_FFFF) & 0x8080_8080_8080_8080)
+    end
+
+    def rotate_l45(bb)
+      (bb & 0x0101_0101_0101_0101) |
+      (((bb >>  8) | (bb << 56) & 0xFFFF_FFFF_FFFF_FFFF) & 0x0202_0202_0202_0202) |
+      (((bb >> 16) | (bb << 48) & 0xFFFF_FFFF_FFFF_FFFF) & 0x0404_0404_0404_0404) |
+      (((bb >> 24) | (bb << 40) & 0xFFFF_FFFF_FFFF_FFFF) & 0x0808_0808_0808_0808) |
+      (((bb >> 32) | (bb << 32) & 0xFFFF_FFFF_FFFF_FFFF) & 0x1010_1010_1010_1010) |
+      (((bb >> 40) | (bb << 24) & 0xFFFF_FFFF_FFFF_FFFF) & 0x2020_2020_2020_2020) |
+      (((bb >> 48) | (bb << 16) & 0xFFFF_FFFF_FFFF_FFFF) & 0x4040_4040_4040_4040) |
+      (((bb >> 56) | (bb <<  8) & 0xFFFF_FFFF_FFFF_FFFF) & 0x8080_8080_8080_8080)
+    end
+
+    def get_rev(x, y, color)
+      p = xy_to_bb(x, y)
+      return 0 if ((@bit_board[[:black] | @bit_board[:white]) & p) != 0
+
+      my, op = case color
+        when :black then [@bit_board[:black], @bit_board[:white]]
+        when :white then [@bit_board[:white], @bit_board[:black]]
+      end
+
+      horizontal_pat(my, op, p) |
+      vertical_pat(my, op, p) |
+      diagonal_pat(my, op, p)
+    end
+
+    def horizontal_pat(my, op, p)
+      op &= 0x7E7E_7E7E_7E7E_7E7E
+      right_pat(my, op, p) | left_pat(my, op, p)
+    end
+
+    def vertical_pat(my, op, p)
+      my = rotate_r90(my)
+      op = rotate_r90(op) & 0x00FF_FFFF_FFFF_FF00
+      p  = rotate_r90(p)
+      rotate_l90(right_pat(my, op, p) | left_pat(my, op, p))
+    end
+
+    def diagonal_pat(my, op, p)
+      my_r45 = rotate_r45(my)
+      op_r45 = rotate_r45(op) & 0x00FF_FFFF_FFFF_FF00
+      p_r45  = rotate_r45(p)
+      my_l45 = rotate_l45(my)
+      op_l45 = rotate_l45(op) & 0x00FF_FFFF_FFFF_FF00
+      p_l45  = rotate_l45(p)
+      rotate_l45(right_pat(my_r45, op_r45, p_r45) | left_pat(my_r45, op_r45, p_r45)) |
+      rotate_r45(right_pat(my_l45, op_l45, p_l45) | left_pat(my_l45, op_l45, p_l45))
+    end
+
+    def left_pat(my, op, p)
+      rev =  (p   << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      ((rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & my) == 0 ? 0 : rev
+    end
+
+    def right_pat(my, op, p)
+      rev =  (p   >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      ((rev >> 1) & my) == 0 ? 0 : rev
+    end
+
+    def horizontal_pos(my, op)
+      op &= 0x7E7E_7E7E_7E7E_7E7E
+      right_pos(my, op) | left_pos(my, op)
+    end
+
+    def vertical_pos(my, op)
+      my = rotate_r90(my)
+      op = rotate_r90(op) & 0x00FF_FFFF_FFFF_FF00
+      rotate_l90(right_pos(my, op) | left_pos(my, op))
+    end
+
+    def diagonal_pos(my, op)
+      my_r45 = rotate_r45(my)
+      op_r45 = rotate_r45(op) & 0x00FF_FFFF_FFFF_FF00
+      my_l45 = rotate_l45(my)
+      op_l45 = rotate_l45(op) & 0x00FF_FFFF_FFFF_FF00
+      rotate_l45(right_pos(my_r45, op_r45) | left_pos(my_r45, op_r45)) |
+      rotate_r45(right_pos(my_l45, op_l45) | left_pos(my_l45, op_l45))
+    end
+
+    def right_pos(my, op)
+      rev =  (my  << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
+      blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
+      (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & blank
+    end
+
+    def left_pos(my, op)
+      rev =  (my  >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      rev |= (rev >> 1) & op
+      blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
+      (rev >> 1) & blank
     end
   end
 end
