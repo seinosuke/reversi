@@ -40,7 +40,7 @@ module Reversi::Player
     end
 
     def check_valid
-      unless next_moves.map{ |v| v[:move] }.include?(@input_move)
+      unless next_moves.include?(@input_move)
         return :redo
       end
       :valid

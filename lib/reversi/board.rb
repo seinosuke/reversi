@@ -30,8 +30,8 @@ module Reversi
       @options = options
       @stack = []
       @bit_board = {
-        :black => 0x0004_0000_8100_0124,
-        :white => 0x0000_0416_7A0E_1400
+        :black => 0x0000_0000_0000_0000,
+        :white => 0x0000_0000_0000_0000
       }
 
       [:disk_color_b, :disk_color_w].each do |color|
@@ -130,6 +130,7 @@ module Reversi
       bb = case color
         when :black then @bit_board[:black]
         when :white then @bit_board[:white]
+        else ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
       end
       bb = (bb & 0x5555_5555_5555_5555) + (bb >> 1  & 0x5555_5555_5555_5555)
       bb = (bb & 0x3333_3333_3333_3333) + (bb >> 2  & 0x3333_3333_3333_3333)
@@ -145,10 +146,13 @@ module Reversi
     # @return [Array<Array<Symbol, Integer>>]
     def next_moves(color)
       my, op = case color
-        when :black then [@black, @white]
-        when :white then [@white, @black]
+        when :black then [@bit_board[:black], @bit_board[:white]]
+        when :white then [@bit_board[:white], @bit_board[:black]]
       end
-      pos = horizontal_pos(my, op) | vertical_pos(my, op) | diagonal_pos(my, op)
+      blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
+      pos = horizontal_pos(my, op, blank) | vertical_pos(my, op, blank) | diagonal_pos(my, op, blank)
+      # blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
+      # pos &= blank
       moves = []
       while pos != 0 do
         p = pos & (~pos + 1) & 0xFFFF_FFFF_FFFF_FFFF
@@ -167,8 +171,8 @@ module Reversi
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       case color
-      when :black then @black ^= p
-      when :white then @white ^= p
+      when :black then @bit_board[:black] ^= p
+      when :white then @bit_board[:white] ^= p
       end
     end
 
@@ -184,11 +188,11 @@ module Reversi
       rev = get_rev(x, y, color)
       case color
       when :black
-        @black ^= p | rev
-        @white ^= rev
+        @bit_board[:black] ^= p | rev
+        @bit_board[:white] ^= rev
       when :white
-        @white ^= p | rev
-        @black ^= rev
+        @bit_board[:white] ^= p | rev
+        @bit_board[:black] ^= rev
       end
     end
 
@@ -260,7 +264,7 @@ module Reversi
 
     def get_rev(x, y, color)
       p = xy_to_bb(x, y)
-      return 0 if ((@bit_board[[:black] | @bit_board[:white]) & p) != 0
+      return 0 if ((@bit_board[:black] | @bit_board[:white]) & p) != 0
 
       my, op = case color
         when :black then [@bit_board[:black], @bit_board[:white]]
@@ -279,17 +283,17 @@ module Reversi
 
     def vertical_pat(my, op, p)
       my = rotate_r90(my)
-      op = rotate_r90(op) & 0x00FF_FFFF_FFFF_FF00
+      op = rotate_r90(op & 0x00FF_FFFF_FFFF_FF00)
       p  = rotate_r90(p)
       rotate_l90(right_pat(my, op, p) | left_pat(my, op, p))
     end
 
     def diagonal_pat(my, op, p)
       my_r45 = rotate_r45(my)
-      op_r45 = rotate_r45(op) & 0x00FF_FFFF_FFFF_FF00
+      op_r45 = rotate_r45(op & 0x007E_7E7E_7E7E_7E00)
       p_r45  = rotate_r45(p)
       my_l45 = rotate_l45(my)
-      op_l45 = rotate_l45(op) & 0x00FF_FFFF_FFFF_FF00
+      op_l45 = rotate_l45(op & 0x00FF_7E7E_7E7E_7E00)
       p_l45  = rotate_l45(p)
       rotate_l45(right_pat(my_r45, op_r45, p_r45) | left_pat(my_r45, op_r45, p_r45)) |
       rotate_r45(right_pat(my_l45, op_l45, p_l45) | left_pat(my_l45, op_l45, p_l45))
@@ -315,45 +319,46 @@ module Reversi
       ((rev >> 1) & my) == 0 ? 0 : rev
     end
 
-    def horizontal_pos(my, op)
+    def horizontal_pos(my, op, blank)
       op &= 0x7E7E_7E7E_7E7E_7E7E
-      right_pos(my, op) | left_pos(my, op)
+      right_pos(my, op, blank) | left_pos(my, op, blank)
     end
 
-    def vertical_pos(my, op)
-      my = rotate_r90(my)
-      op = rotate_r90(op) & 0x00FF_FFFF_FFFF_FF00
-      rotate_l90(right_pos(my, op) | left_pos(my, op))
+    def vertical_pos(my, op, blank)
+      my    = rotate_r90(my)
+      op    = rotate_r90(op & 0x00FF_FFFF_FFFF_FF00)
+      blank = rotate_r90(blank)
+      rotate_l90(right_pos(my, op, blank) | left_pos(my, op, blank))
     end
 
-    def diagonal_pos(my, op)
-      my_r45 = rotate_r45(my)
-      op_r45 = rotate_r45(op) & 0x00FF_FFFF_FFFF_FF00
-      my_l45 = rotate_l45(my)
-      op_l45 = rotate_l45(op) & 0x00FF_FFFF_FFFF_FF00
-      rotate_l45(right_pos(my_r45, op_r45) | left_pos(my_r45, op_r45)) |
-      rotate_r45(right_pos(my_l45, op_l45) | left_pos(my_l45, op_l45))
+    def diagonal_pos(my, op, blank)
+      my_r45    = rotate_r45(my)
+      op_r45    = rotate_r45(op & 0x007E_7E7E_7E7E_7E00)
+      blank_r45 = rotate_r45(blank)
+      my_l45    = rotate_l45(my)
+      op_l45    = rotate_l45(op & 0x007E_7E7E_7E7E_7E00)
+      blank_l45 = rotate_l45(blank)
+      rotate_l45(right_pos(my_r45, op_r45, blank_r45) | left_pos(my_r45, op_r45, blank_r45)) |
+      rotate_r45(right_pos(my_l45, op_l45, blank_l45) | left_pos(my_l45, op_l45, blank_l45))
     end
 
-    def right_pos(my, op)
+    def right_pos(my, op, blank)
       rev =  (my  << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
       rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
       rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
       rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
       rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
       rev |= (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & op
-      blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
       (rev << 1) & 0xFFFF_FFFF_FFFF_FFFF & blank
     end
 
-    def left_pos(my, op)
+    def left_pos(my, op, blank)
       rev =  (my  >> 1) & op
       rev |= (rev >> 1) & op
       rev |= (rev >> 1) & op
       rev |= (rev >> 1) & op
       rev |= (rev >> 1) & op
       rev |= (rev >> 1) & op
-      blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
       (rev >> 1) & blank
     end
   end
