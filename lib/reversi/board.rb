@@ -1,6 +1,6 @@
 module Reversi
   class Board
-    attr_reader :options
+    attr_reader :options, :stack
 
     DISK = {
       :none  =>  0,
@@ -108,8 +108,23 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Integer] the openness
     def openness(x, y)
-      # x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
-      # board_openness(x, y)
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
+      p = xy_to_bb(x, y)
+      blank = ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
+      bb = ((p << 1) & (blank & 0xFEFE_FEFE_FEFE_FEFE)) |
+           ((p >> 1) & (blank & 0x7F7F_7F7F_7F7F_7F7F)) |
+           ((p << 8) & (blank & 0xFFFF_FFFF_FFFF_FFFF)) |
+           ((p >> 8) & (blank & 0xFFFF_FFFF_FFFF_FFFF)) |
+           ((p << 7) & (blank & 0x7F7F_7F7F_7F7F_7F7F)) |
+           ((p >> 7) & (blank & 0xFEFE_FEFE_FEFE_FEFE)) |
+           ((p << 9) & (blank & 0xFEFE_FEFE_FEFE_FEFE)) |
+           ((p >> 9) & (blank & 0x7F7F_7F7F_7F7F_7F7F))
+      bb = (bb & 0x5555_5555_5555_5555) + (bb >> 1  & 0x5555_5555_5555_5555)
+      bb = (bb & 0x3333_3333_3333_3333) + (bb >> 2  & 0x3333_3333_3333_3333)
+      bb = (bb & 0x0F0F_0F0F_0F0F_0F0F) + (bb >> 4  & 0x0F0F_0F0F_0F0F_0F0F)
+      bb = (bb & 0x00FF_00FF_00FF_00FF) + (bb >> 8  & 0x00FF_00FF_00FF_00FF)
+      bb = (bb & 0x0000_FFFF_0000_FFFF) + (bb >> 16 & 0x0000_FFFF_0000_FFFF)
+           (bb & 0x0000_0000_FFFF_FFFF) + (bb >> 32 & 0x0000_0000_FFFF_FFFF)
     end
 
     # Returns the color of supplied coordinates.
@@ -118,8 +133,12 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Symbol] the color or `:none`
     def at(x, y)
-      # x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
-      # DISK.key(board_at(x, y))
+      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
+      p = xy_to_bb(x, y)
+      if    (p & @bit_board[:black]) != 0 then return :black
+      elsif (p & @bit_board[:white]) != 0 then return :white
+      else return :none
+      end
     end
 
     # Counts the number of the supplied color's disks.
@@ -151,8 +170,6 @@ module Reversi
       end
       blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
       pos = horizontal_pos(my, op, blank) | vertical_pos(my, op, blank) | diagonal_pos(my, op, blank)
-      # blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
-      # pos &= blank
       moves = []
       while pos != 0 do
         p = pos & (~pos + 1) & 0xFFFF_FFFF_FFFF_FFFF

@@ -40,7 +40,8 @@ module Reversi::Player
     # @param my_color [Boolean] my color or opponent's color
     # @return [Integer] a number of the supplied color's disks
     def count_disks(my_color = true)
-      @board.count_disks(my_color ? @my_color : @opponent_color)
+      color = my_color ? @my_color : @opponent_color
+      @board.count_disks(color)
     end
 
     # Returns a hash containing the coordinates of each color.
