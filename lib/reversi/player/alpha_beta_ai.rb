@@ -21,7 +21,7 @@ module Reversi::Player
     end
 
     def move(board)
-      moves = next_moves.sort_by{ |v| v[:openness] }.map{ |v| v[:move] }
+      moves = next_moves
       return if moves.empty?
       alpha = -N; beta = N
       next_move = moves.map do |move|
@@ -32,7 +32,7 @@ module Reversi::Player
 
     def evaluate(move, board, alpha, beta, depth, color)
       put_disk(*move, color)
-      moves = next_moves(!color).sort_by{ |v| v[:openness] }.map{ |v| v[:move] }
+      moves = next_moves(!color)
 
       if depth == 1
         status[:mine].inject(0){ |sum, xy| sum + @evaluation_value[xy] }
