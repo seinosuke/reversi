@@ -14,8 +14,8 @@ describe Reversi::Game do
 
     context "before `player_w` places a piece on position [f4]" do
       it do
-        ans = [[3, 5], [4, 6], [5, 3], [6, 4], [7, 5], [7, 7]]
-        expect(@game.player_w.next_moves.map{ |move| move[:move] }).to eq ans
+        ans = [[7, 7], [4, 6], [7, 5], [3, 5], [6, 4], [5, 3]]
+        expect(@game.player_w.next_moves).to eq ans
       end
       it { expect(@game.player_w.count_disks).to eq 3 }
       it { expect(@game.player_b.count_disks).to eq 7 }
@@ -26,8 +26,8 @@ describe Reversi::Game do
         @game.player_w.put_disk(:f, 4)
       end
       it do
-        ans = [[3, 5], [3, 6], [4, 6], [6, 2], [7, 2], [8, 3]]
-        expect(@game.player_w.next_moves.map{ |move| move[:move] }).to eq ans
+        ans = [[4, 6], [3, 6], [3, 5], [8, 3], [7, 2], [6, 2]]
+        expect(@game.player_w.next_moves).to eq ans
       end
       it { expect(@game.player_w.count_disks).to eq 7 }
       it { expect(@game.player_b.count_disks).to eq 4 }
@@ -96,18 +96,10 @@ describe Reversi::Game do
     game.player_b.put_disk(:a, 1); game.player_w.put_disk(:b, 1)
                                    game.player_w.put_disk(:g, 8)
     game.player_b.put_disk(:h, 8)
-    ans = [
-      [2,  2,  2,  2,  2,  2,  2,  2,  2, 2],
-      [2, -1, -1, -1, -1, -1, -1, -1, -1, 2],
-      [2,  1,  1,  1, -1, -1,  1, -1, -1, 2],
-      [2,  1,  1, -1,  1,  1, -1, -1, -1, 2],
-      [2,  1, -1,  1,  1, -1, -1, -1, -1, 2],
-      [2,  1, -1, -1,  1, -1,  1, -1, -1, 2],
-      [2,  1, -1, -1, -1,  1, -1,  1, -1, 2],
-      [2,  1, -1, -1,  1,  1,  1, -1, -1, 2],
-      [2,  1, -1,  1,  1,  1,  1, -1, -1, 2],
-      [2,  2,  2,  2,  2,  2,  2,  2,  2, 2]
-    ]
-    it { expect(game.board.columns).to eq ans }
+    ans = {
+      :black =>0x809F_AEC4_D8B4_FBFF,
+      :white =>0x7F60_513B_274B_0400
+    }
+    it { expect(game.board.bit_board).to eq ans }
   end
 end

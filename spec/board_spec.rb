@@ -142,8 +142,8 @@ describe Reversi::Board do
   describe "#next_moves" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it { expect(board.next_moves(:black)).to eq [[3, 4], [4, 3], [5, 6], [6, 5]] }
-    it { expect(board.next_moves(:white)).to eq [[3, 5], [4, 6], [5, 3], [6, 4]] }
+    it { expect(board.next_moves(:black)).to eq [[5, 6], [6, 5], [3, 4], [4, 3]] }
+    it { expect(board.next_moves(:white)).to eq [[4, 6], [3, 5], [6, 4], [5, 3]] }
   end
 
   describe "#put_disk, #flip_disks" do
@@ -153,8 +153,7 @@ describe Reversi::Board do
       board.put_disk(:d, 6, :white)
       board.put_disk(:e, 3, :white)
       board.put_disk(:f, 3, :black)
-      board.put_disk(:d, 3, :black)
-      expect{ board.flip_disks(:d, 3, :black) }.to change{ board.status[:black].size }.by(2)
+      expect{ board.flip_disks(:d, 3, :black) }.to change{ board.status[:black].size }.by(3)
     end
   end
 end

@@ -1,6 +1,6 @@
 module Reversi
   class Board
-    attr_reader :options, :stack
+    attr_reader :options, :stack, :bit_board
 
     DISK = {
       :none  =>  0,
@@ -84,20 +84,13 @@ module Reversi
       black = @bit_board[:black]
       white = @bit_board[:white]
       blank = ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
-      while black != 0 do
-        p = black & (~black + 1) & 0xFFFF_FFFF_FFFF_FFFF
-        ary[0] << bb_to_xy(p)
-        black ^= p
-      end
-      while white != 0 do
-        p = white & (~white + 1) & 0xFFFF_FFFF_FFFF_FFFF
-        ary[1] << bb_to_xy(p)
-        white ^= p
-      end
-      while blank != 0 do
-        p = blank & (~blank + 1) & 0xFFFF_FFFF_FFFF_FFFF
-        ary[2] << bb_to_xy(p)
-        blank ^= p
+
+      [black, white, blank].each_with_index do |color, i|
+        while color != 0 do
+          p = color & (~color + 1) & 0xFFFF_FFFF_FFFF_FFFF
+          ary[i] << bb_to_xy(p)
+          color ^= p
+        end
       end
       {:black => ary[0], :white => ary[1], :none => ary[2]}
     end

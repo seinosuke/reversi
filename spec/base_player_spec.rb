@@ -22,29 +22,15 @@ describe Reversi::Player::BasePlayer do
   describe "#next_moves" do
     context "when the first argument is omitted" do
       it do
-        ans = [[3, 4], [4, 3], [5, 6], [6, 5]]
-        expect(player.next_moves.map{ |move| move[:move] }).to eq ans
-      end
-
-      it do
-        player.put_disk(:d, 3)
-        player.put_disk(:e, 3, false)
-        expect(player.next_moves[1][:openness]).to eq 8
-        expect(player.next_moves[1][:result]).to eq [[5, 3], [5, 4]]
+        ans = [[5, 6], [6, 5], [3, 4], [4, 3]]
+        expect(player.next_moves).to eq ans
       end
     end
 
     context "when the first argument is `false`" do
       it do
-        ans = [[3, 5], [4, 6], [5, 3], [6, 4]]
-        expect(player.next_moves(false).map{ |move| move[:move] }).to eq ans
-      end
-
-      it do
-        player.put_disk(:d, 3)
-        player.put_disk(:e, 3, false)
-        expect(player.next_moves(false)[0][:openness]).to eq 5
-        expect(player.next_moves(false)[0][:result]).to eq [[4, 3]]
+        ans = [[4, 6], [3, 5], [6, 4], [5, 3]]
+        expect(player.next_moves(false)).to eq ans
       end
     end
   end
@@ -67,6 +53,6 @@ describe Reversi::Player::BasePlayer do
 
   describe "#status" do
     it { expect(player.status[:mine]).to eq [[4, 5], [5, 4]] }
-    it { expect(player.status[:opponent]).to eq [[4, 4], [5, 5]] }
+    it { expect(player.status[:opponent]).to eq [[5, 5], [4, 4]] }
   end
 end
