@@ -1,6 +1,6 @@
 module Reversi
   class Board
-    attr_reader :options, :stack, :bit_board
+    attr_reader :options, :stack
 
     DISK = {
       :none  =>  0,
@@ -29,10 +29,7 @@ module Reversi
     def initialize(options = {})
       @options = options
       @stack = []
-      @bit_board = {
-        :black => 0x0000_0000_0000_0000,
-        :white => 0x0000_0000_0000_0000
-      }
+      board_initialize
 
       [:disk_color_b, :disk_color_w].each do |color|
         if @options[color].is_a?(Symbol) || @options[color].is_a?(String)
@@ -53,8 +50,8 @@ module Reversi
       "   #{"+---"*8}+\n" <<
       (0..63).map do |i|
         case 1
-        when @bit_board[:black][63 - i] then "\e[#{@options[:disk_color_b]}m#{@options[:disk_b]}\e[0m"
-        when @bit_board[:white][63 - i] then "\e[#{@options[:disk_color_w]}m#{@options[:disk_w]}\e[0m"
+        when black_getter[63 - i] then "\e[#{@options[:disk_color_b]}m#{@options[:disk_b]}\e[0m"
+        when white_getter[63 - i] then "\e[#{@options[:disk_color_w]}m#{@options[:disk_w]}\e[0m"
         else " "
         end
       end
@@ -68,12 +65,15 @@ module Reversi
     # Pushes an array of the game board onto a stack.
     # The stack size limit is 3(default).
     def push_stack
-      @stack.push(Marshal.load(Marshal.dump(@bit_board)))
+      bb = {:black => black_getter,:white => white_getter}
+      @stack.push(Marshal.load(Marshal.dump(bb)))
       @stack.shift if @stack.size > @options[:stack_limit]
     end
 
     def undo!
-      @bit_board = @stack.pop
+      bb = @stack.pop
+      black_setter(bb[:black])
+      white_setter(bb[:white])
     end
 
     # Returns a hash containing the coordinates of each color.
@@ -81,9 +81,9 @@ module Reversi
     # @return [Hash{Symbol => Array<Symbol, Integer>}]
     def status
       ary = [[], [], []]
-      black = @bit_board[:black]
-      white = @bit_board[:white]
-      blank = ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
+      black = black_getter
+      white = white_getter
+      blank = ~(black | white) & 0xFFFF_FFFF_FFFF_FFFF
 
       [black, white, blank].each_with_index do |color, i|
         while color != 0 do
@@ -103,7 +103,7 @@ module Reversi
     def openness(x, y)
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
-      blank = ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
+      blank = ~(black_getter | white_getter) & 0xFFFF_FFFF_FFFF_FFFF
       bb = ((p << 1) & (blank & 0xFEFE_FEFE_FEFE_FEFE)) |
            ((p >> 1) & (blank & 0x7F7F_7F7F_7F7F_7F7F)) |
            ((p << 8) & (blank & 0xFFFF_FFFF_FFFF_FFFF)) |
@@ -128,8 +128,8 @@ module Reversi
     def at(x, y)
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
-      if    (p & @bit_board[:black]) != 0 then return :black
-      elsif (p & @bit_board[:white]) != 0 then return :white
+      if    (p & black_getter) != 0 then return :black
+      elsif (p & white_getter) != 0 then return :white
       else return :none
       end
     end
@@ -140,9 +140,9 @@ module Reversi
     # @return [Integer] the sum of the counted disks
     def count_disks(color)
       bb = case color
-        when :black then @bit_board[:black]
-        when :white then @bit_board[:white]
-        else ~(@bit_board[:black] | @bit_board[:white]) & 0xFFFF_FFFF_FFFF_FFFF
+        when :black then black_getter
+        when :white then white_getter
+        else ~(black_getter | white_getter) & 0xFFFF_FFFF_FFFF_FFFF
       end
       bb = (bb & 0x5555_5555_5555_5555) + (bb >> 1  & 0x5555_5555_5555_5555)
       bb = (bb & 0x3333_3333_3333_3333) + (bb >> 2  & 0x3333_3333_3333_3333)
@@ -158,8 +158,8 @@ module Reversi
     # @return [Array<Array<Symbol, Integer>>]
     def next_moves(color)
       my, op = case color
-        when :black then [@bit_board[:black], @bit_board[:white]]
-        when :white then [@bit_board[:white], @bit_board[:black]]
+        when :black then [black_getter, white_getter]
+        when :white then [white_getter, black_getter]
       end
       blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
       pos = horizontal_pos(my, op, blank) | vertical_pos(my, op, blank) | diagonal_pos(my, op, blank)
@@ -181,8 +181,8 @@ module Reversi
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       case color
-      when :black then @bit_board[:black] ^= p
-      when :white then @bit_board[:white] ^= p
+      when :black then black_setter(black_getter ^ p)
+      when :white then white_setter(white_getter ^ p)
       end
     end
 
@@ -198,11 +198,11 @@ module Reversi
       rev = get_rev(x, y, color)
       case color
       when :black
-        @bit_board[:black] ^= p | rev
-        @bit_board[:white] ^= rev
+        black_setter(black_getter ^ (p | rev))
+        white_setter(white_getter ^ rev)
       when :white
-        @bit_board[:white] ^= p | rev
-        @bit_board[:black] ^= rev
+        white_setter(white_getter ^ (p | rev))
+        black_setter(black_getter ^ rev)
       end
     end
 
@@ -274,11 +274,11 @@ module Reversi
 
     def get_rev(x, y, color)
       p = xy_to_bb(x, y)
-      return 0 if ((@bit_board[:black] | @bit_board[:white]) & p) != 0
+      return 0 if ((black_getter | white_getter) & p) != 0
 
       my, op = case color
-        when :black then [@bit_board[:black], @bit_board[:white]]
-        when :white then [@bit_board[:white], @bit_board[:black]]
+        when :black then [black_getter, white_getter]
+        when :white then [white_getter, black_getter]
       end
 
       horizontal_pat(my, op, p) |

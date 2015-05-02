@@ -1,10 +1,13 @@
+#ifndef RUBY_REVERSI_H
+#define RUBY_REVERSI_H
+
 #include <ruby.h>
 #include <stdlib.h>
 #include <memory.h>
-
 #include <stdio.h>
 
-void Init_board(void);
-static VALUE hello(VALUE self);
+#include "board.h"
 
+void Init_reversi(void);
 
+#endif

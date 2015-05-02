@@ -100,6 +100,9 @@ describe Reversi::Game do
       :black =>0x809F_AEC4_D8B4_FBFF,
       :white =>0x7F60_513B_274B_0400
     }
-    it { expect(game.board.bit_board).to eq ans }
+    it do
+      expect(game.board.black_getter).to eq ans[:black]
+      expect(game.board.white_getter).to eq ans[:white]
+    end
   end
 end
