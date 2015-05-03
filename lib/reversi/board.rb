@@ -70,6 +70,8 @@ module Reversi
       @stack.shift if @stack.size > @options[:stack_limit]
     end
 
+    # Pops a hash of the game board off of the stack,
+    # and that is stored in the instance variable.(`@bit_board`)
     def undo!
       bb = @stack.pop
       black_setter(bb[:black])

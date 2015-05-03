@@ -7,7 +7,9 @@
 #include <stdio.h>
 
 #include "board.h"
+#include "bit_board_functions.h"
 
 void Init_reversi(void);
+VALUE test(VALUE self);
 
 #endif

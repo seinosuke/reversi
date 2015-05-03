@@ -6,10 +6,18 @@ void Init_reversi(void) {
 
   rb_define_alloc_func(reversi_board, bit_board_alloc);
 
+  rb_define_method(reversi_board, "test", test, 0);
+
   rb_define_method(reversi_board, "black_setter", black_setter, 1);
   rb_define_method(reversi_board, "white_setter", white_setter, 1);
   rb_define_method(reversi_board, "black_getter", black_getter, 0);
   rb_define_method(reversi_board, "white_getter", white_getter, 0);
 
   rb_define_private_method(reversi_board, "board_initialize", board_initialize, 0);
+}
+
+VALUE test(VALUE self) {
+  // unsigned long bb = rotate_r45(0xFF818181818181FF);
+  // printf("%lx\n", bb);
+  return Qnil;
 }
