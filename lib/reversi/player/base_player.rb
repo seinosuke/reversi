@@ -24,7 +24,6 @@ module Reversi::Player
     def put_disk(x, y, my_color = true)
       @board.push_stack
       color = my_color ? @my_color : @opponent_color
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
       @board.flip_disks(x, y, color)
     end
 

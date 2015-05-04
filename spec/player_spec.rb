@@ -9,20 +9,20 @@ end
 
 class InvalidPlayer1 < Reversi::Player::BasePlayer
   def move(board)
-    put_disk(:a, 1)
+    put_disk(1, 1)
   end
 end
 
 class InvalidPlayer2 < Reversi::Player::BasePlayer
   def move(board)
-    put_disk(:d, 4)
+    put_disk(4, 4)
   end
 end
 
 class InvalidPlayer3 < Reversi::Player::BasePlayer
   def move(board)
-    put_disk(:a, 1)
-    put_disk(:a, 2)
+    put_disk(1, 1)
+    put_disk(1, 2)
   end
 end
 

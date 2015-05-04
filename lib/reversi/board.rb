@@ -102,7 +102,6 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Integer] the openness
     def openness(x, y)
-      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       blank = ~(black_getter | white_getter) & 0xFFFF_FFFF_FFFF_FFFF
       bb = ((p << 1) & (blank & 0xFEFE_FEFE_FEFE_FEFE)) |
@@ -127,7 +126,6 @@ module Reversi
     # @param y [Integer] the row number
     # @return [Symbol] the color or `:none`
     def at(x, y)
-      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       if    (p & black_getter) != 0 then return :black
       elsif (p & white_getter) != 0 then return :white
@@ -179,7 +177,6 @@ module Reversi
     # @param y [Integer] the row number
     # @param color [Symbol]
     def put_disk(x, y, color)
-      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       case color
       when DISK[:black] then black_setter(black_getter ^ p)
@@ -194,7 +191,6 @@ module Reversi
     # @param y [Integer] the row number
     # @param color [Symbol]
     def flip_disks(x, y, color)
-      x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       rev = get_rev(x, y, color)
       case color

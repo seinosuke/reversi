@@ -8,13 +8,13 @@ describe Reversi::Player::BasePlayer do
   describe "#put_disk" do
     context "when a player make a valid move" do
       it "flips the opponent's disks between a new disk and my disk" do
-        expect{ player.put_disk(:d, 3) }.to change{ board.status[:black].size }.by(2)
+        expect{ player.put_disk(4, 3) }.to change{ board.status[:black].size }.by(2)
       end
     end
 
     context "when the third argument is `false`" do
       it "makes a opponent's move" do
-        expect{ player.put_disk(:e, 3, false) }.to change{ board.status[:white].size }.by(2)
+        expect{ player.put_disk(5, 3, false) }.to change{ board.status[:white].size }.by(2)
       end
     end
   end
@@ -38,14 +38,14 @@ describe Reversi::Player::BasePlayer do
   describe "#count_disks" do
     context "when the first argument is omitted" do
       it do
-        board.put_disk(:a, 1, Reversi::Board::DISK[:black])
+        board.put_disk(1, 1, Reversi::Board::DISK[:black])
         expect(player.count_disks).to eq 3
       end
     end
 
     context "when the first argument is `false`" do
       it do
-        board.put_disk(:a, 1, Reversi::Board::DISK[:black])
+        board.put_disk(1, 1, Reversi::Board::DISK[:black])
         expect(player.count_disks(false)).to eq 2
       end
     end
