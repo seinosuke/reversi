@@ -38,14 +38,14 @@ describe Reversi::Player::BasePlayer do
   describe "#count_disks" do
     context "when the first argument is omitted" do
       it do
-        board.put_disk(:a, 1, :black)
+        board.put_disk(:a, 1, Reversi::Board::DISK[:black])
         expect(player.count_disks).to eq 3
       end
     end
 
     context "when the first argument is `false`" do
       it do
-        board.put_disk(:a, 1, :black)
+        board.put_disk(:a, 1, Reversi::Board::DISK[:black])
         expect(player.count_disks(false)).to eq 2
       end
     end

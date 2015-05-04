@@ -4,12 +4,12 @@ describe Reversi::Game do
   describe "next moves" do
     before do
       @game = Reversi::Game.new
-      @game.board.put_disk(6, 3, :black)
-      @game.board.put_disk(6, 5, :black)
-      @game.board.put_disk(6, 6, :black)
-      @game.board.put_disk(6, 7, :white)
-      @game.board.put_disk(7, 4, :black)
-      @game.board.put_disk(8, 4, :black)
+      @game.board.put_disk(6, 3, Reversi::Board::DISK[:black])
+      @game.board.put_disk(6, 5, Reversi::Board::DISK[:black])
+      @game.board.put_disk(6, 6, Reversi::Board::DISK[:black])
+      @game.board.put_disk(6, 7, Reversi::Board::DISK[:white])
+      @game.board.put_disk(7, 4, Reversi::Board::DISK[:black])
+      @game.board.put_disk(8, 4, Reversi::Board::DISK[:black])
     end
 
     context "before `player_w` places a piece on position [f4]" do

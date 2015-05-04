@@ -75,7 +75,7 @@ describe Reversi::Board do
 
     it "the deep copy operation is used" do
       board.push_stack
-      board.put_disk(:a, 1, :black)
+      board.put_disk(:a, 1, Reversi::Board::DISK[:black])
       board.push_stack
       expect(board.stack[0]).not_to eq board.stack[1]
     end
@@ -97,8 +97,10 @@ describe Reversi::Board do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
     it "returns a hash containing the coordinates of each color" do
-      expect{ board.put_disk(:a, 1, :black) }.to change{ board.status[:black].size }.by(1)
-      expect{ board.put_disk(:b, 1, :black) }.to change{ board.status[:none].size }.by(-1)
+      expect{ board.put_disk(:a, 1, Reversi::Board::DISK[:black]) }
+        .to change{ board.status[:black].size }.by(1)
+      expect{ board.put_disk(:b, 1, Reversi::Board::DISK[:black]) }
+        .to change{ board.status[:none].size }.by(-1)
     end
   end
 
@@ -118,14 +120,14 @@ describe Reversi::Board do
 
     context "when the first argument is a number" do
       it do
-        board.put_disk(:c, 3, :white)
+        board.put_disk(:c, 3, Reversi::Board::DISK[:white])
         expect(board.at(3, 3)).to eq :white
       end
     end
 
     context "when the first argument is a symbol" do
       it do
-        board.put_disk(7, 8, :black)
+        board.put_disk(7, 8, Reversi::Board::DISK[:black])
         expect(board.at(:g, 8)).to eq :black
       end
     end
@@ -134,26 +136,29 @@ describe Reversi::Board do
   describe "#count_disks" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it { expect(board.count_disks(:black)).to eq 2 }
-    it { expect(board.count_disks(:white)).to eq 2 }
-    it { expect(board.count_disks(:none)).to eq 60 }
+    it { expect(board.count_disks(Reversi::Board::DISK[:black])).to eq 2 }
+    it { expect(board.count_disks(Reversi::Board::DISK[:white])).to eq 2 }
+    it { expect(board.count_disks(Reversi::Board::DISK[:none])).to eq 60 }
   end
 
   describe "#next_moves" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it { expect(board.next_moves(:black)).to eq [[5, 6], [6, 5], [3, 4], [4, 3]] }
-    it { expect(board.next_moves(:white)).to eq [[4, 6], [3, 5], [6, 4], [5, 3]] }
+    it { expect(board.next_moves(Reversi::Board::DISK[:black]))
+      .to eq [[5, 6], [6, 5], [3, 4], [4, 3]] }
+    it { expect(board.next_moves(Reversi::Board::DISK[:white]))
+      .to eq [[4, 6], [3, 5], [6, 4], [5, 3]] }
   end
 
   describe "#put_disk, #flip_disks" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
     it "flips the opponent's disks between a new disk and another disk of my color" do
-      board.put_disk(:d, 6, :white)
-      board.put_disk(:e, 3, :white)
-      board.put_disk(:f, 3, :black)
-      expect{ board.flip_disks(:d, 3, :black) }.to change{ board.status[:black].size }.by(3)
+      board.put_disk(:d, 6, Reversi::Board::DISK[:white])
+      board.put_disk(:e, 3, Reversi::Board::DISK[:white])
+      board.put_disk(:f, 3, Reversi::Board::DISK[:black])
+      expect{ board.flip_disks(:d, 3, Reversi::Board::DISK[:black]) }
+        .to change{ board.status[:black].size }.by(3)
     end
   end
 end

@@ -17,7 +17,5 @@ void Init_reversi(void) {
 }
 
 VALUE test(VALUE self) {
-  // unsigned long bb = rotate_r45(0xFF818181818181FF);
-  // printf("%lx\n", bb);
   return Qnil;
 }

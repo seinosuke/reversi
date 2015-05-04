@@ -4,7 +4,6 @@ module Reversi
 
     DISK = {
       :none  =>  0,
-      :wall  =>  2,
       :black => -1,
       :white =>  1
     }.freeze
@@ -38,7 +37,7 @@ module Reversi
       end
 
       @options[:initial_position].each do |color, positions|
-        positions.each{ |position| put_disk(*position, color) }
+        positions.each{ |position| put_disk(*position, DISK[color]) }
       end
     end
 
@@ -142,8 +141,8 @@ module Reversi
     # @return [Integer] the sum of the counted disks
     def count_disks(color)
       bb = case color
-        when :black then black_getter
-        when :white then white_getter
+        when DISK[:black] then black_getter
+        when DISK[:white] then white_getter
         else ~(black_getter | white_getter) & 0xFFFF_FFFF_FFFF_FFFF
       end
       bb = (bb & 0x5555_5555_5555_5555) + (bb >> 1  & 0x5555_5555_5555_5555)
@@ -160,8 +159,8 @@ module Reversi
     # @return [Array<Array<Symbol, Integer>>]
     def next_moves(color)
       my, op = case color
-        when :black then [black_getter, white_getter]
-        when :white then [white_getter, black_getter]
+        when DISK[:black] then [black_getter, white_getter]
+        when DISK[:white] then [white_getter, black_getter]
       end
       blank = ~(my | op) & 0xFFFF_FFFF_FFFF_FFFF
       pos = horizontal_pos(my, op, blank) | vertical_pos(my, op, blank) | diagonal_pos(my, op, blank)
@@ -183,8 +182,8 @@ module Reversi
       x = [*:a..:h].index(x) + 1 if x.is_a? Symbol
       p = xy_to_bb(x, y)
       case color
-      when :black then black_setter(black_getter ^ p)
-      when :white then white_setter(white_getter ^ p)
+      when DISK[:black] then black_setter(black_getter ^ p)
+      when DISK[:white] then white_setter(white_getter ^ p)
       end
     end
 
@@ -199,10 +198,10 @@ module Reversi
       p = xy_to_bb(x, y)
       rev = get_rev(x, y, color)
       case color
-      when :black
+      when DISK[:black]
         black_setter(black_getter ^ (p | rev))
         white_setter(white_getter ^ rev)
-      when :white
+      when DISK[:white]
         white_setter(white_getter ^ (p | rev))
         black_setter(black_getter ^ rev)
       end
@@ -279,8 +278,8 @@ module Reversi
       return 0 if ((black_getter | white_getter) & p) != 0
 
       my, op = case color
-        when :black then [black_getter, white_getter]
-        when :white then [white_getter, black_getter]
+        when DISK[:black] then [black_getter, white_getter]
+        when DISK[:white] then [white_getter, black_getter]
       end
 
       horizontal_pat(my, op, p) |

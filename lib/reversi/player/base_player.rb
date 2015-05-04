@@ -5,7 +5,9 @@ module Reversi::Player
     # Initializes a new BasePlayer object.
     def initialize(color, board)
       @my_color = color
-      @opponent_color = (@my_color == :white ? :black : :white)
+      @opponent_color = 
+        @my_color == Reversi::Board::DISK[:white] ? 
+        Reversi::Board::DISK[:black] : Reversi::Board::DISK[:white]
       @board = board
     end
 
@@ -49,8 +51,8 @@ module Reversi::Player
     # @return [Hash{Symbol => Array<Symbol, Integer>}]
     def status
       convert = {
-        :black => @my_color == :black ? :mine : :opponent,
-        :white => @my_color == :white ? :mine : :opponent,
+        :black => @my_color == Reversi::Board::DISK[:black] ? :mine : :opponent,
+        :white => @my_color == Reversi::Board::DISK[:white] ? :mine : :opponent,
         :none  => :none }
       Hash[*@board.status.map{ |k, v| [convert[k], v] }.flatten(1)]
     end

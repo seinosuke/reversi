@@ -25,8 +25,8 @@ module Reversi
       @board = Board.new(@options)
       @player_class_b = @player_b
       @player_class_w = @player_w
-      @player_b = @player_class_b.new(:black, @board)
-      @player_w = @player_class_w.new(:white, @board)
+      @player_b = @player_class_b.new(Reversi::Board::DISK[:black], @board)
+      @player_w = @player_class_w.new(Reversi::Board::DISK[:white], @board)
     end
 
     # Load the configuration.
@@ -53,11 +53,13 @@ module Reversi
       loop do
         break if game_over?
         @status = @board.status
-        @player_b.move(@board); check_move(:black)
+        @player_b.move(@board)
+        check_move(:black)
         show_board if mode[:progress]
 
         @status = @board.status
-        @player_w.move(@board); check_move(:white)
+        @player_w.move(@board)
+        check_move(:white)
         show_board if mode[:progress]
       end
       puts @board.to_s if mode[:progress] || mode[:vs_human]
@@ -77,12 +79,12 @@ module Reversi
 
       case blank_diff
       when 1
-        if (@board.count_disks(color) - @status[color].size) < 2
+        if (@board.count_disks(Reversi::Board::DISK[color]) - @status[color].size) < 2
           raise MoveError, "A player must flip at least one or more opponent's disks."
         end
       when 0
-        unless (@board.count_disks(:black) - @status[:black].size) == 0 &&
-               (@board.count_disks(:white) - @status[:white].size) == 0
+        unless (@board.count_disks(Reversi::Board::DISK[:black]) - @status[:black].size) == 0 &&
+               (@board.count_disks(Reversi::Board::DISK[:white]) - @status[:white].size) == 0
           raise MoveError, "When a player can't make a valid move, you must not place a new disk."
         end
       else
