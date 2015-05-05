@@ -15,4 +15,6 @@ VALUE white_setter(VALUE self, VALUE white);
 VALUE black_getter(VALUE self);
 VALUE white_getter(VALUE self);
 
+VALUE status(VALUE self);
+
 #endif

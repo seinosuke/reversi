@@ -61,3 +61,45 @@ VALUE white_getter(VALUE self) {
   Data_Get_Struct(self, struct bit_board, ptr);
   return ULONG2NUM(ptr->white);
 }
+
+/*
+ * Returns a hash containing the coordinates of each color.
+ *
+ * @return [Hash{Symbol => Array<Array<Integer, Integer>>}]
+ */
+VALUE status(VALUE self) {
+  VALUE black_ary = rb_ary_new();
+  VALUE white_ary = rb_ary_new();
+  VALUE none_ary  = rb_ary_new();
+  VALUE status = rb_hash_new();
+  unsigned long black = 0, white = 0, blank = 0, p = 0;
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  black = ptr->black;
+  while (black != 0) {
+    p = black & (~black + 1);
+    rb_ary_push(black_ary, BB2XY(p));
+    black ^= p;
+  }
+  rb_hash_aset(status, ID2SYM(rb_intern("black")), black_ary);
+
+  white = ptr->white;
+  while (white != 0) {
+    p = white & (~white + 1);
+    rb_ary_push(white_ary, BB2XY(p));
+    white ^= p;
+  }
+  rb_hash_aset(status, ID2SYM(rb_intern("white")), white_ary);
+
+  blank = ~(ptr->black | ptr->white);
+  while (blank != 0) {
+    p = blank & (~blank + 1);
+    rb_ary_push(none_ary, BB2XY(p));
+    blank ^= p;
+  }
+  rb_hash_aset(status, ID2SYM(rb_intern("none")), none_ary);
+
+  return status;
+}
+

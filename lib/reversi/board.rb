@@ -77,25 +77,6 @@ module Reversi
       white_setter(bb[:white])
     end
 
-    # Returns a hash containing the coordinates of each color.
-    #
-    # @return [Hash{Symbol => Array<Symbol, Integer>}]
-    def status
-      ary = [[], [], []]
-      black = black_getter
-      white = white_getter
-      blank = ~(black | white) & 0xFFFF_FFFF_FFFF_FFFF
-
-      [black, white, blank].each_with_index do |color, i|
-        while color != 0 do
-          p = color & (~color + 1) & 0xFFFF_FFFF_FFFF_FFFF
-          ary[i] << bb_to_xy(p)
-          color ^= p
-        end
-      end
-      {:black => ary[0], :white => ary[1], :none => ary[2]}
-    end
-
     # Returns the openness of the coordinates.
     #
     # @param x [Symbol, Integer] the column number

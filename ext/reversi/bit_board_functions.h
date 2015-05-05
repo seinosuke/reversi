@@ -3,13 +3,8 @@
 
 #include "reversi.h"
 
-struct point{
-  int x;
-  int y;
-};
-
 unsigned long XY2BB(int x, int y);
-struct point BB2XY(unsigned long bb);
+VALUE BB2XY(unsigned long bb);
 
 unsigned long get_rev(VALUE self, int x, int y, int color);
 

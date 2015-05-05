@@ -13,9 +13,14 @@ void Init_reversi(void) {
   rb_define_method(reversi_board, "black_getter", black_getter, 0);
   rb_define_method(reversi_board, "white_getter", white_getter, 0);
 
+  rb_define_method(reversi_board, "status", status, 0);
+
   rb_define_private_method(reversi_board, "board_initialize", board_initialize, 0);
 }
 
 VALUE test(VALUE self) {
-  return Qnil;
+  // VALUE hash = rb_hash_new();
+  // rb_hash_aset(hash, ID2SYM(rb_intern("hoge")), INT2FIX(3));
+  // return hash;
+  return BB2XY(0x8000000000000000);
 }
