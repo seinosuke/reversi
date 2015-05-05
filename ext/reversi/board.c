@@ -103,3 +103,151 @@ VALUE status(VALUE self) {
   return status;
 }
 
+/*
+ * Returns the openness of the coordinates.
+ *
+ * @param rb_x [Integer] the column number
+ * @param rb_y [Integer] the row number
+ * @return [Integer] the openness
+ */
+VALUE openness(VALUE self, VALUE rb_x, VALUE rb_y) {
+  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  unsigned long blank = 0, bb = 0;
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  blank = ~(ptr->black | ptr->white);
+  bb = ((p << 1) & (blank & 0xFEFEFEFEFEFEFEFE)) |
+       ((p >> 1) & (blank & 0x7F7F7F7F7F7F7F7F)) |
+       ((p << 8) & (blank & 0xFFFFFFFFFFFFFFFF)) |
+       ((p >> 8) & (blank & 0xFFFFFFFFFFFFFFFF)) |
+       ((p << 7) & (blank & 0x7F7F7F7F7F7F7F7F)) |
+       ((p >> 7) & (blank & 0xFEFEFEFEFEFEFEFE)) |
+       ((p << 9) & (blank & 0xFEFEFEFEFEFEFEFE)) |
+       ((p >> 9) & (blank & 0x7F7F7F7F7F7F7F7F));
+  bb = (bb & 0x5555555555555555) + (bb >> 1  & 0x5555555555555555);
+  bb = (bb & 0x3333333333333333) + (bb >> 2  & 0x3333333333333333);
+  bb = (bb & 0x0F0F0F0F0F0F0F0F) + (bb >> 4  & 0x0F0F0F0F0F0F0F0F);
+  bb = (bb & 0x00FF00FF00FF00FF) + (bb >> 8  & 0x00FF00FF00FF00FF);
+  bb = (bb & 0x0000FFFF0000FFFF) + (bb >> 16 & 0x0000FFFF0000FFFF);
+  return INT2FIX((int)((bb & 0x00000000FFFFFFFF) + (bb >> 32 & 0x00000000FFFFFFFF)));
+}
+
+/*
+ * Returns the color of supplied coordinates.
+ *
+ * @param rb_x [Integer] the column number
+ * @param rb_y [Integer] the row number
+ * @return [Symbol] the color or `:none`
+ */
+VALUE at(VALUE self, VALUE rb_x, VALUE rb_y) {
+  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  if      ((p & ptr->black) != 0) { return ID2SYM(rb_intern("black")); }
+  else if ((p & ptr->white) != 0) { return ID2SYM(rb_intern("white")); }
+  else { return ID2SYM(rb_intern("none")); }
+}
+
+/*
+ * Counts the number of the supplied color's disks.
+ *
+ * @param color [Integer]
+ * @return [Integer] the sum of the counted disks
+ */
+VALUE count_disks(VALUE self, VALUE color) {
+  unsigned long bb = 0;
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  switch (FIX2INT(color)) {
+    case -1: bb = ptr->black; break;
+    case  1: bb = ptr->white; break;
+    default: bb = ~(ptr->black | ptr->white); break;
+  }
+  bb = (bb & 0x5555555555555555) + (bb >> 1  & 0x5555555555555555);
+  bb = (bb & 0x3333333333333333) + (bb >> 2  & 0x3333333333333333);
+  bb = (bb & 0x0F0F0F0F0F0F0F0F) + (bb >> 4  & 0x0F0F0F0F0F0F0F0F);
+  bb = (bb & 0x00FF00FF00FF00FF) + (bb >> 8  & 0x00FF00FF00FF00FF);
+  bb = (bb & 0x0000FFFF0000FFFF) + (bb >> 16 & 0x0000FFFF0000FFFF);
+  return INT2FIX((int)((bb & 0x00000000FFFFFFFF) + (bb >> 32 & 0x00000000FFFFFFFF)));
+}
+
+/*
+ * Returns an array of the next moves.
+ *
+ * @param color [Integer]
+ * @return [Array<Array<Integer, Integer>>]
+ */
+VALUE next_moves(VALUE self, VALUE color) {
+  unsigned long my = 0, op = 0, blank = 0, p = 0, pos = 0;
+  VALUE moves = rb_ary_new();
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  switch (FIX2INT(color)) {
+    case -1: my = ptr->black; op = ptr->white; break;
+    case  1: my = ptr->white; op = ptr->black; break;
+  }
+  blank = ~(my | op);
+  pos = horizontal_pos(my, op, blank) | vertical_pos(my, op, blank) | diagonal_pos(my, op, blank);
+  while (pos != 0) {
+    p = pos & (~pos + 1);
+    rb_ary_push(moves, BB2XY(p));
+    pos ^= p;
+  }
+  return moves;
+}
+
+/*
+ * Places a supplied color's disk on specified position.
+ *
+ * @param rb_x [Integer] the column number
+ * @param rb_y [Integer] the row number
+ * @param color [Integer]
+ */
+VALUE put_disk(VALUE self, VALUE rb_x, VALUE rb_y, VALUE color) {
+  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  switch (FIX2INT(color)) {
+    case -1: ptr->black ^= p; break;
+    case  1: ptr->white ^= p; break;
+  }
+  return Qnil;
+}
+
+/*
+ * Flips the opponent's disks between a new disk and another disk of my color.
+ * The invalid move has no effect.
+ *
+ * @param rb_x [Integer] the column number
+ * @param rb_y [Integer] the row number
+ * @param color [Integer]
+ */
+VALUE flip_disks(VALUE self, VALUE rb_x, VALUE rb_y, VALUE color) {
+  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  unsigned long my = 0, op = 0, rev = 0;
+  struct bit_board *ptr;
+  Data_Get_Struct(self, struct bit_board, ptr);
+
+  switch(FIX2INT(color)) {
+    case -1:
+      my = ptr->black; op = ptr->white;
+      if (((ptr->black | ptr->white) & p) != 0) { rev = 0; }
+      else { rev = horizontal_pat(my, op, p) | vertical_pat(my, op, p) | diagonal_pat(my, op, p); }
+      ptr->black = (ptr->black ^ (p | rev));
+      ptr->white = (ptr->white ^ rev);
+      break;
+    case  1:
+      my = ptr->white; op = ptr->black;
+      if (((ptr->black | ptr->white) & p) != 0) { rev = 0; }
+      else { rev = horizontal_pat(my, op, p) | vertical_pat(my, op, p) | diagonal_pat(my, op, p); }
+      ptr->white = (ptr->white ^ (p | rev));
+      ptr->black = (ptr->black ^ rev);
+      break;
+  }
+  return Qnil;
+}

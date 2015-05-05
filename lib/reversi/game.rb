@@ -75,7 +75,7 @@ module Reversi
 
     # Checks a move to make sure it is valid.
     def check_move(color)
-      blank_diff = @status[:none].size - @board.count_disks(:none)
+      blank_diff = @status[:none].size - @board.count_disks(Reversi::Board::DISK[:none])
 
       case blank_diff
       when 1

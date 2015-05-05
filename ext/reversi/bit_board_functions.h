@@ -6,8 +6,6 @@
 unsigned long XY2BB(int x, int y);
 VALUE BB2XY(unsigned long bb);
 
-unsigned long get_rev(VALUE self, int x, int y, int color);
-
 unsigned long rotate_r90(unsigned long bb);
 unsigned long rotate_l90(unsigned long bb);
 unsigned long rotate_r45(unsigned long bb);

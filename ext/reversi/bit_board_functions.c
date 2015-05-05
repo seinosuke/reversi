@@ -83,30 +83,6 @@ VALUE BB2XY(unsigned long bb) {
   return xy;
 }
 
-unsigned long get_rev(VALUE self, int x, int y, int color) {
-  unsigned long p = XY2BB(x, y);
-  unsigned my = 0, op = 0;
-  struct bit_board *ptr;
-  Data_Get_Struct(self, struct bit_board, ptr);
-
-  if (((ptr->black | ptr->white) & p) != 0) return 0;
-
-  switch(color) {
-    case -1:
-      my = ptr->black;
-      op = ptr->white;
-      break;
-    case 1:
-      my = ptr->white;
-      op = ptr->black;
-      break;
-  }
-
-  return horizontal_pat(my, op, p) |
-         vertical_pat(my, op, p) |
-         diagonal_pat(my, op, p);
-}
-
 unsigned long rotate_r90(unsigned long bb) {
   bb = ((bb <<  8) & 0xAA00AA00AA00AA00) |
        ((bb >>  8) & 0x0055005500550055) |
@@ -175,7 +151,7 @@ unsigned long vertical_pat(unsigned long my, unsigned long op, unsigned long p) 
   return rotate_l90(right_pat(my, op, p) | left_pat(my, op, p));
 }
 
-unsigned long diagnal_pat(unsigned long my, unsigned long op, unsigned long p) {
+unsigned long diagonal_pat(unsigned long my, unsigned long op, unsigned long p) {
   unsigned long my_r45 = rotate_r45(my);
   unsigned long op_r45 = rotate_r45(op & 0x007E7E7E7E7E7E00);
   unsigned long p_r45  = rotate_r45(p);
@@ -218,7 +194,7 @@ unsigned long vertical_pos(unsigned long my, unsigned long op, unsigned long bla
   return rotate_l90(right_pos(my, op, blank) | left_pos(my, op, blank));
 }
 
-unsigned long diagnal_pos(unsigned long my, unsigned long op, unsigned long blank) {
+unsigned long diagonal_pos(unsigned long my, unsigned long op, unsigned long blank) {
   unsigned long my_r45    = rotate_r45(my);
   unsigned long op_r45    = rotate_r45(op & 0x007E7E7E7E7E7E00);
   unsigned long blank_r45 = rotate_r45(blank);

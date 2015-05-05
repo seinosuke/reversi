@@ -6,21 +6,21 @@ void Init_reversi(void) {
 
   rb_define_alloc_func(reversi_board, bit_board_alloc);
 
-  rb_define_method(reversi_board, "test", test, 0);
+  /* These private methods are used in the board.rb file. */
+  rb_define_private_method(reversi_board, "black_setter", black_setter, 1);
+  rb_define_private_method(reversi_board, "white_setter", white_setter, 1);
+  rb_define_private_method(reversi_board, "black_getter", black_getter, 0);
+  rb_define_private_method(reversi_board, "white_getter", white_getter, 0);
 
-  rb_define_method(reversi_board, "black_setter", black_setter, 1);
-  rb_define_method(reversi_board, "white_setter", white_setter, 1);
-  rb_define_method(reversi_board, "black_getter", black_getter, 0);
-  rb_define_method(reversi_board, "white_getter", white_getter, 0);
-
-  rb_define_method(reversi_board, "status", status, 0);
-
+  /* This method is used in the `Reversi::Board.new` method. */
   rb_define_private_method(reversi_board, "board_initialize", board_initialize, 0);
-}
 
-VALUE test(VALUE self) {
-  // VALUE hash = rb_hash_new();
-  // rb_hash_aset(hash, ID2SYM(rb_intern("hoge")), INT2FIX(3));
-  // return hash;
-  return BB2XY(0x8000000000000000);
+  /* The instance method for a Reversi::Board object. */
+  rb_define_method(reversi_board, "status", status, 0);
+  rb_define_method(reversi_board, "openness", openness, 2);
+  rb_define_method(reversi_board, "at", at, 2);
+  rb_define_method(reversi_board, "count_disks", count_disks, 1);
+  rb_define_method(reversi_board, "next_moves", next_moves, 1);
+  rb_define_method(reversi_board, "put_disk", put_disk, 3);
+  rb_define_method(reversi_board, "flip_disks", flip_disks, 3);
 }
