@@ -83,20 +83,21 @@ game.start
 
 You can make your original player class by inheriting `Reversi::Player::BasePlayer` and defining `move` method.  
 
-`next_moves` method returns an array of the next moves information. A player places a supplied color's disk on specified position, and flips the opponent's disks by using `put_disk` method. You can get the current game board state from a `board` variable or `status` method.
+`next_moves` method returns an array of the next moves. A player places a supplied color's disk on specified position, and flips the opponent's disks by using `put_disk` method. You can get the current game board state from a `board` variable or `status` method.
 
  * **Example of Random Player**
 
 ```ruby
 class MyAI < Reversi::Player::BasePlayer
   def move(board)
-    moves = next_moves.map{ |v| v[:move] }
+    moves = next_moves
     put_disk(*moves.sample) unless moves.empty?
   end
 end
 
 Reversi.configure do |config|
   config.player_b = MyAI
+  config.progress = true
 end
 
 game = Reversi::Game.new
@@ -127,7 +128,7 @@ class MyAI < Reversi::Player::BasePlayer
   end
 
   def move(board)
-    moves = next_moves.map{ |v| v[:move] }
+    moves = next_moves
     return if moves.empty?
     next_move = moves.map do |move|
       { :move => move, :point => evaluate(move, board, 3, true) }
@@ -140,7 +141,7 @@ class MyAI < Reversi::Player::BasePlayer
     put_disk(*move, color)
 
     # Acquire the branches of this node.
-    moves = next_moves(!color).map{ |v| v[:move] }
+    moves = next_moves(!color)
 
     # Evaluate a current game-state when a search reaches the leaf node.
     if depth == 1
@@ -167,6 +168,7 @@ end
 
 Reversi.configure do |config|
   config.player_b = MyAI
+  config.progress = true
 end
 
 game = Reversi::Game.new
