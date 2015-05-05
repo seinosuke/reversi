@@ -5,7 +5,9 @@ module Reversi::Player
     # Initializes a new BasePlayer object.
     def initialize(color, board)
       @my_color = color
-      @opponent_color = (@my_color == :white ? :black : :white)
+      @opponent_color = 
+        @my_color == Reversi::Board::DISK[:white] ? 
+        Reversi::Board::DISK[:black] : Reversi::Board::DISK[:white]
       @board = board
     end
 
@@ -22,9 +24,7 @@ module Reversi::Player
     def put_disk(x, y, my_color = true)
       @board.push_stack
       color = my_color ? @my_color : @opponent_color
-      x = (:a..:h).to_a.index(x) + 1 if x.is_a? Symbol
-      flip_disks(x, y, color)
-      @board.put_disk(x, y, color)
+      @board.flip_disks(x, y, color)
     end
 
     # Returns an array of the next moves.
@@ -33,13 +33,7 @@ module Reversi::Player
     # @return [Hash] the next moves
     def next_moves(my_color = true)
       color = my_color ? @my_color : @opponent_color
-      @board.next_moves(color).map do |move|
-        diff = flip_disks(*move, color)
-        openness = diff.inject(0){ |sum, (x, y)| sum + @board.openness(x, y) }
-        # undo the flipped disks
-        diff.each{ |x, y| @board.put_disk(x, y, my_color ? @opponent_color : @my_color) }
-        {:move => move, :openness => openness, :result => diff}
-      end
+      @board.next_moves(color)
     end
 
     # Returns a number of the supplied color's disks.
@@ -47,7 +41,8 @@ module Reversi::Player
     # @param my_color [Boolean] my color or opponent's color
     # @return [Integer] a number of the supplied color's disks
     def count_disks(my_color = true)
-      @board.count_disks(my_color ? @my_color : @opponent_color)
+      color = my_color ? @my_color : @opponent_color
+      @board.count_disks(color)
     end
 
     # Returns a hash containing the coordinates of each color.
@@ -55,19 +50,10 @@ module Reversi::Player
     # @return [Hash{Symbol => Array<Symbol, Integer>}]
     def status
       convert = {
-        :black => @my_color == :black ? :mine : :opponent,
-        :white => @my_color == :white ? :mine : :opponent,
+        :black => @my_color == Reversi::Board::DISK[:black] ? :mine : :opponent,
+        :white => @my_color == Reversi::Board::DISK[:white] ? :mine : :opponent,
         :none  => :none }
       Hash[*@board.status.map{ |k, v| [convert[k], v] }.flatten(1)]
-    end
-
-    private
-
-    def flip_disks(x, y, color)
-      before = @board.status[color]
-      @board.flip_disks(x, y, color)
-      after = @board.status[color]
-      after - before
     end
   end
 end

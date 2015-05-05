@@ -19,7 +19,7 @@ module Reversi::Player
     end
 
     def move(board)
-      moves = next_moves.map{ |v| v[:move] }
+      moves = next_moves
       return if moves.empty?
       next_move = moves.map do |move|
         { :move => move, :point => evaluate(move, board, 3, true) }
@@ -29,7 +29,7 @@ module Reversi::Player
 
     def evaluate(move, board, depth, color)
       put_disk(*move, color)
-      moves = next_moves(!color).map{ |v| v[:move] }
+      moves = next_moves(!color)
 
       if depth == 1
         status[:mine].inject(0){ |sum, xy| sum + @evaluation_value[xy] }

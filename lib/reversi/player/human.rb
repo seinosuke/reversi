@@ -1,6 +1,15 @@
 module Reversi::Player
   class Human < BasePlayer
 
+    def initialize(color, _board)
+      super
+
+      case color
+      when Reversi::Board::DISK[:black] then @color = :black
+      when Reversi::Board::DISK[:white] then @color = :white
+      end
+    end
+
     def move(board)
       return if next_moves.empty?
       puts board.to_s
@@ -14,7 +23,7 @@ module Reversi::Player
 
     def input_move
       loop do
-        print "#{@my_color}: "
+        print "#{@color}: "
         @input_move = gets.chomp.split("")
         exit if [['q'], ['e','x','i','t']].include? @input_move
         redo if check_size == :redo
@@ -40,7 +49,7 @@ module Reversi::Player
     end
 
     def check_valid
-      unless next_moves.map{ |v| v[:move] }.include?(@input_move)
+      unless next_moves.include?(@input_move)
         return :redo
       end
       :valid

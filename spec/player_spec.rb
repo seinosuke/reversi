@@ -2,27 +2,27 @@ require 'spec_helper'
 
 class ValidPlayer < Reversi::Player::BasePlayer
   def move(board)
-    moves = next_moves.map{ |v| v[:move] }
+    moves = next_moves
     put_disk(*moves.sample) unless moves.empty?
   end
 end
 
 class InvalidPlayer1 < Reversi::Player::BasePlayer
   def move(board)
-    put_disk(:a, 1)
+    put_disk(1, 1)
   end
 end
 
 class InvalidPlayer2 < Reversi::Player::BasePlayer
   def move(board)
-    put_disk(:d, 4)
+    put_disk(4, 4)
   end
 end
 
 class InvalidPlayer3 < Reversi::Player::BasePlayer
   def move(board)
-    put_disk(:a, 1)
-    put_disk(:a, 2)
+    put_disk(1, 1)
+    put_disk(1, 2)
   end
 end
 

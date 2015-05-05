@@ -8,8 +8,8 @@ describe Reversi::Board do
      :disk_w => "w",
      :disk_color_b => disk_color_b,
      :disk_color_w => disk_color_w,
-     :initial_position => {:black => [[:d, 5], [:e, 4]],
-                           :white => [[:d, 4], [:e, 5]]},
+     :initial_position => {:black => [[4, 5], [5, 4]],
+                           :white => [[4, 4], [5, 5]]},
      :progress => false,
      :stack_limit => 3}
   end
@@ -75,7 +75,7 @@ describe Reversi::Board do
 
     it "the deep copy operation is used" do
       board.push_stack
-      board.put_disk(:a, 1, :black)
+      board.put_disk(1, 1, Reversi::Board::DISK[:black])
       board.push_stack
       expect(board.stack[0]).not_to eq board.stack[1]
     end
@@ -97,8 +97,10 @@ describe Reversi::Board do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
     it "returns a hash containing the coordinates of each color" do
-      expect{ board.put_disk(:a, 1, :black) }.to change{ board.status[:black].size }.by(1)
-      expect{ board.put_disk(:b, 1, :black) }.to change{ board.status[:none].size }.by(-1)
+      expect{ board.put_disk(1, 1, Reversi::Board::DISK[:black]) }
+        .to change{ board.status[:black].size }.by(1)
+      expect{ board.put_disk(2, 1, Reversi::Board::DISK[:black]) }
+        .to change{ board.status[:none].size }.by(-1)
     end
   end
 
@@ -106,9 +108,9 @@ describe Reversi::Board do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
     it "returns the openness of the coordinates" do
-      expect(board.openness(:a, 1)).to eq 3
-      expect(board.openness(:b, 2)).to eq 8
-      expect(board.openness(:d, 4)).to eq 5
+      expect(board.openness(1, 1)).to eq 3
+      expect(board.openness(2, 2)).to eq 8
+      expect(board.openness(4, 4)).to eq 5
     end
   end
 
@@ -116,45 +118,40 @@ describe Reversi::Board do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
 
-    context "when the first argument is a number" do
-      it do
-        board.put_disk(:c, 3, :white)
-        expect(board.at(3, 3)).to eq :white
-      end
-    end
-
-    context "when the first argument is a symbol" do
-      it do
-        board.put_disk(7, 8, :black)
-        expect(board.at(:g, 8)).to eq :black
-      end
+    it do
+      board.put_disk(3, 3, Reversi::Board::DISK[:white])
+      expect(board.at(3, 3)).to eq :white
+      expect(board.at(1, 1)).to eq :none
+      expect(board.at(4, 5)).to eq :black
     end
   end
 
   describe "#count_disks" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it { expect(board.count_disks(:black)).to eq 2 }
-    it { expect(board.count_disks(:white)).to eq 2 }
-    it { expect(board.count_disks(:none)).to eq 60 }
+    it { expect(board.count_disks(Reversi::Board::DISK[:black])).to eq 2 }
+    it { expect(board.count_disks(Reversi::Board::DISK[:white])).to eq 2 }
+    it { expect(board.count_disks(Reversi::Board::DISK[:none])).to eq 60 }
   end
 
   describe "#next_moves" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
-    it { expect(board.next_moves(:black)).to eq [[3, 4], [4, 3], [5, 6], [6, 5]] }
-    it { expect(board.next_moves(:white)).to eq [[3, 5], [4, 6], [5, 3], [6, 4]] }
+    it { expect(board.next_moves(Reversi::Board::DISK[:black]))
+      .to eq [[5, 6], [6, 5], [3, 4], [4, 3]] }
+    it { expect(board.next_moves(Reversi::Board::DISK[:white]))
+      .to eq [[4, 6], [3, 5], [6, 4], [5, 3]] }
   end
 
   describe "#put_disk, #flip_disks" do
     let(:disk_color_b) { 0 }
     let(:disk_color_w) { 0 }
     it "flips the opponent's disks between a new disk and another disk of my color" do
-      board.put_disk(:d, 6, :white)
-      board.put_disk(:e, 3, :white)
-      board.put_disk(:f, 3, :black)
-      board.put_disk(:d, 3, :black)
-      expect{ board.flip_disks(:d, 3, :black) }.to change{ board.status[:black].size }.by(2)
+      board.put_disk(4, 6, Reversi::Board::DISK[:white])
+      board.put_disk(5, 3, Reversi::Board::DISK[:white])
+      board.put_disk(6, 3, Reversi::Board::DISK[:black])
+      expect{ board.flip_disks(4, 3, Reversi::Board::DISK[:black]) }
+        .to change{ board.status[:black].size }.by(3)
     end
   end
 end
