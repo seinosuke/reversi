@@ -18,7 +18,7 @@ module Reversi::Player
     # Places a supplied color's disk on specified position,
     # and flips the opponent's disks.
     #
-    # @param x [Symbol, Integer] the column number
+    # @param x [Integer] the column number
     # @param y [Integer] the row number
     # @param my_color [Boolean] my color or opponent's color
     def put_disk(x, y, my_color = true)
@@ -30,7 +30,7 @@ module Reversi::Player
     # Returns an array of the next moves.
     #
     # @param my_color [Boolean] my color or opponent's color
-    # @return [Hash] the next moves
+    # @return [Array<Array<Integer, Integer>>] the next moves
     def next_moves(my_color = true)
       color = my_color ? @my_color : @opponent_color
       @board.next_moves(color)
@@ -47,7 +47,7 @@ module Reversi::Player
 
     # Returns a hash containing the coordinates of each color.
     #
-    # @return [Hash{Symbol => Array<Symbol, Integer>}]
+    # @return [Hash{Symbol => Array<Integer, Integer>}]
     def status
       convert = {
         :black => @my_color == Reversi::Board::DISK[:black] ? :mine : :opponent,

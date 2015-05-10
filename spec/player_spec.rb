@@ -34,7 +34,7 @@ describe Reversi::Player do
       Reversi.configure do |config|
         config.player_b = ValidPlayer
       end
-      expect(game.start).to eq nil
+      expect{ game.start }.not_to raise_error
     end
   end
 

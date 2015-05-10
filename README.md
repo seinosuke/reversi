@@ -45,17 +45,16 @@ puts "white #{game.board.status[:white].size}"
 
 Use `Reversi.configure` to configure setting for a reversi game.  
 
-`name` description... (default value)  
-
-* `player_b` A player having the first move uses this class object. ( Reversi::Player::RandomAI )
-* `player_w` A player having the passive move uses this class object. ( Reversi::Player::RandomAI )
-* `disk_b` A string of the black disks. ( 'b' )
-* `disk_w` A string of the black disks. ( 'w' )
-* `disk_color_b` A color of the black disks. ( 0 )
-* `disk_color_w` A color of the black disks. ( 0 )
-* `initial_position` The initial positions of each disk on the board.
-* `progress` Whether or not the progress of the game is displayed. ( false )
-* `stack_limit` The upper limit number of times of use repeatedly `Reversi::Board#undo!` . ( 3 )
+| name | description | default |
+|:----:|:----:|:----:|
+| player_b     | A player having the first move uses this class object. | `Reversi::Player::RandomAI` |
+| player_w     | A player having the passive move uses this class object. | `Reversi::Player::RandomAI` |
+| disk_b       | A string of the black disks. | 'b' |
+| disk_w       | A string of the white disks. | 'w' |
+| disk_color_b | A color of the black disks. | 'white' |
+| disk_color_w | A color of the white disks. | 'white' |
+| progress     | Whether or not the progress of the game is displayed. | `false` |
+| stack_limit  | The upper limit number of times of use repeatedly `Reversi::Board#undo!` | 3 |
 
 A string and a color of the disks are reflected on `game.board.to_s` .  
 You can choose from 9 colors, black, red, green, yellow, blue, magenda, cyan, white and gray.  

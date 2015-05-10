@@ -176,6 +176,7 @@ VALUE count_disks(VALUE self, VALUE color) {
 
 /*
  * Returns an array of the next moves.
+ * This method is used in Reversi::Player::BasePlayer class.
  *
  * @param color [Integer]
  * @return [Array<Array<Integer, Integer>>]
@@ -202,6 +203,9 @@ VALUE next_moves(VALUE self, VALUE color) {
 
 /*
  * Places a supplied color's disk on specified position.
+ * This method is used in Reversi::Board.initialize method
+ * for putting the disks at the initial position,
+ * but not used in Reversi::Player::BasePlayer class.
  *
  * @param rb_x [Integer] the column number
  * @param rb_y [Integer] the row number
@@ -221,7 +225,9 @@ VALUE put_disk(VALUE self, VALUE rb_x, VALUE rb_y, VALUE color) {
 
 /*
  * Flips the opponent's disks between a new disk and another disk of my color.
- * The invalid move has no effect.
+ * This method is used in Reversi::Player::BasePlayer class.
+ * When the invalid move is supplied, a disk is put only the position
+ * and Reversi::MoveError is raised at Reversi::Game.check_move method.
  *
  * @param rb_x [Integer] the column number
  * @param rb_y [Integer] the row number
