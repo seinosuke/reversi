@@ -39,6 +39,10 @@ module Reversi
       @options[:initial_position].each do |color, positions|
         positions.each{ |position| put_disk(*position, DISK[color]) }
       end
+
+      if @options[:disk_b].size != 1 || @options[:disk_w].size != 1
+        raise OptionError, "The length of the disk string must be one."
+      end
     end
 
     # Returns a string of the game board in human-readable form.

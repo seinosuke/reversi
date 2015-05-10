@@ -10,4 +10,5 @@ module Reversi
   extend Configuration
 
   class MoveError < StandardError; end
+  class OptionError < StandardError; end
 end
