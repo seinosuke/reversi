@@ -25,6 +25,7 @@ module Reversi
     # @see Reversi::Game
     # @see Reversi::Configration
     # @return [Reversi::Board]
+    # @raise [OptionError] Error is raised when the supplied option is invalid.
     def initialize(options = {})
       @options = options
       @stack = []

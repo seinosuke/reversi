@@ -1,9 +1,15 @@
 #include "bit_board_functions.h"
 
+/*
+ * Convert coordinate data to a bitboard.
+ */
 unsigned long XY2BB(int x, int y) {
   return (unsigned long)1 << ((8-x) + (8-y) * 8);
 }
 
+/*
+ * Convert a bitboard to coordinate data.
+ */
 VALUE BB2XY(unsigned long bb) {
   VALUE xy = rb_ary_new();
 
@@ -83,6 +89,9 @@ VALUE BB2XY(unsigned long bb) {
   return xy;
 }
 
+/*
+ * Rotate a bitboard by 90 degrees to the right.
+ */
 unsigned long rotate_r90(unsigned long bb) {
   bb = ((bb <<  8) & 0xAA00AA00AA00AA00) |
        ((bb >>  8) & 0x0055005500550055) |
@@ -99,6 +108,9 @@ unsigned long rotate_r90(unsigned long bb) {
   return bb;
 }
 
+/*
+ * Rotate a bitboard by 90 degrees to the left.
+ */
 unsigned long rotate_l90(unsigned long bb) {
   bb = ((bb <<  1) & 0xAA00AA00AA00AA00) |
        ((bb >>  1) & 0x0055005500550055) |
@@ -115,6 +127,9 @@ unsigned long rotate_l90(unsigned long bb) {
   return bb;
 }
 
+/*
+ * Rotate a bitboard by 45 degrees to the right.
+ */
 unsigned long rotate_r45(unsigned long bb) {
   bb = (bb & 0x0101010101010101) |
        (((bb <<  8) | (bb >> 56)) & 0x0202020202020202) |
@@ -127,6 +142,9 @@ unsigned long rotate_r45(unsigned long bb) {
   return bb;
 }
 
+/*
+ * Rotate a bitboard by 45 degrees to the left.
+ */
 unsigned long rotate_l45(unsigned long bb) {
   bb = (bb & 0x0101010101010101) |
        (((bb >>  8) | (bb << 56)) & 0x0202020202020202) |

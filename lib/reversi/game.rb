@@ -74,6 +74,8 @@ module Reversi
     end
 
     # Checks a move to make sure it is valid.
+    #
+    # @raise [MoveError] Error is raised when a player make an invalid move.
     def check_move(color)
       blank_diff = @status[:none].size - @board.count_disks(Reversi::Board::DISK[:none])
 
