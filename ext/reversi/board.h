@@ -4,8 +4,8 @@
 #include "reversi.h"
 
 struct bit_board {
-  unsigned long black;
-  unsigned long white;
+  uint64_t black;
+  uint64_t white;
 };
 
 VALUE bit_board_alloc(VALUE class);

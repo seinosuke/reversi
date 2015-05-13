@@ -72,7 +72,7 @@ VALUE status(VALUE self) {
   VALUE white_ary = rb_ary_new();
   VALUE none_ary  = rb_ary_new();
   VALUE status = rb_hash_new();
-  unsigned long black = 0, white = 0, blank = 0, p = 0;
+  uint64_t black = 0, white = 0, blank = 0, p = 0;
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
 
@@ -111,8 +111,8 @@ VALUE status(VALUE self) {
  * @return [Integer] the openness
  */
 VALUE openness(VALUE self, VALUE rb_x, VALUE rb_y) {
-  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
-  unsigned long blank = 0, bb = 0;
+  uint64_t p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  uint64_t blank = 0, bb = 0;
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
 
@@ -141,7 +141,7 @@ VALUE openness(VALUE self, VALUE rb_x, VALUE rb_y) {
  * @return [Symbol] the color or `:none`
  */
 VALUE at(VALUE self, VALUE rb_x, VALUE rb_y) {
-  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  uint64_t p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
 
@@ -157,7 +157,7 @@ VALUE at(VALUE self, VALUE rb_x, VALUE rb_y) {
  * @return [Integer] the sum of the counted disks
  */
 VALUE count_disks(VALUE self, VALUE color) {
-  unsigned long bb = 0;
+  uint64_t bb = 0;
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
 
@@ -182,7 +182,7 @@ VALUE count_disks(VALUE self, VALUE color) {
  * @return [Array<Array<Integer, Integer>>]
  */
 VALUE next_moves(VALUE self, VALUE color) {
-  unsigned long my = 0, op = 0, blank = 0, p = 0, pos = 0;
+  uint64_t my = 0, op = 0, blank = 0, p = 0, pos = 0;
   VALUE moves = rb_ary_new();
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
@@ -212,7 +212,7 @@ VALUE next_moves(VALUE self, VALUE color) {
  * @param color [Integer]
  */
 VALUE put_disk(VALUE self, VALUE rb_x, VALUE rb_y, VALUE color) {
-  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  uint64_t p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
 
@@ -234,8 +234,8 @@ VALUE put_disk(VALUE self, VALUE rb_x, VALUE rb_y, VALUE color) {
  * @param color [Integer]
  */
 VALUE flip_disks(VALUE self, VALUE rb_x, VALUE rb_y, VALUE color) {
-  unsigned long p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
-  unsigned long my = 0, op = 0, rev = 0;
+  uint64_t p = XY2BB(FIX2INT(rb_x), FIX2INT(rb_y));
+  uint64_t my = 0, op = 0, rev = 0;
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
 
