@@ -3,24 +3,24 @@
 
 #include "reversi.h"
 
-unsigned long XY2BB(int x, int y);
-VALUE BB2XY(unsigned long bb);
+uint64_t XY2BB(int x, int y);
+VALUE BB2XY(uint64_t bb);
 
-unsigned long rotate_r90(unsigned long bb);
-unsigned long rotate_l90(unsigned long bb);
-unsigned long rotate_r45(unsigned long bb);
-unsigned long rotate_l45(unsigned long bb);
+uint64_t rotate_r90(uint64_t bb);
+uint64_t rotate_l90(uint64_t bb);
+uint64_t rotate_r45(uint64_t bb);
+uint64_t rotate_l45(uint64_t bb);
 
-unsigned long horizontal_pat(unsigned long my, unsigned long op, unsigned long p);
-unsigned long vertical_pat(unsigned long my, unsigned long op, unsigned long p);
-unsigned long diagonal_pat(unsigned long my, unsigned long op, unsigned long p);
-unsigned long right_pat(unsigned long my, unsigned long op, unsigned long p);
-unsigned long left_pat(unsigned long my, unsigned long op, unsigned long p);
+uint64_t horizontal_pat(uint64_t my, uint64_t op, uint64_t p);
+uint64_t vertical_pat(uint64_t my, uint64_t op, uint64_t p);
+uint64_t diagonal_pat(uint64_t my, uint64_t op, uint64_t p);
+uint64_t right_pat(uint64_t my, uint64_t op, uint64_t p);
+uint64_t left_pat(uint64_t my, uint64_t op, uint64_t p);
 
-unsigned long horizontal_pos(unsigned long my, unsigned long op, unsigned long blank);
-unsigned long vertical_pos(unsigned long my, unsigned long op, unsigned long blank);
-unsigned long diagonal_pos(unsigned long my, unsigned long op, unsigned long blank);
-unsigned long right_pos(unsigned long my, unsigned long op, unsigned long blank);
-unsigned long left_pos(unsigned long my, unsigned long op, unsigned long blank);
+uint64_t horizontal_pos(uint64_t my, uint64_t op, uint64_t blank);
+uint64_t vertical_pos(uint64_t my, uint64_t op, uint64_t blank);
+uint64_t diagonal_pos(uint64_t my, uint64_t op, uint64_t blank);
+uint64_t right_pos(uint64_t my, uint64_t op, uint64_t blank);
+uint64_t left_pos(uint64_t my, uint64_t op, uint64_t blank);
 
 #endif

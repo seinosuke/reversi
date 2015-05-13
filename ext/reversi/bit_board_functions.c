@@ -3,14 +3,14 @@
 /*
  * Convert coordinate data to a bitboard.
  */
-unsigned long XY2BB(int x, int y) {
-  return (unsigned long)1 << ((8-x) + (8-y) * 8);
+uint64_t XY2BB(int x, int y) {
+  return (uint64_t)1 << ((8-x) + (8-y) * 8);
 }
 
 /*
  * Convert a bitboard to coordinate data.
  */
-VALUE BB2XY(unsigned long bb) {
+VALUE BB2XY(uint64_t bb) {
   VALUE xy = rb_ary_new();
 
   switch(bb) {
@@ -92,7 +92,7 @@ VALUE BB2XY(unsigned long bb) {
 /*
  * Rotate a bitboard by 90 degrees to the right.
  */
-unsigned long rotate_r90(unsigned long bb) {
+uint64_t rotate_r90(uint64_t bb) {
   bb = ((bb <<  8) & 0xAA00AA00AA00AA00) |
        ((bb >>  8) & 0x0055005500550055) |
        ((bb <<  1) & 0x00AA00AA00AA00AA) |
@@ -111,7 +111,7 @@ unsigned long rotate_r90(unsigned long bb) {
 /*
  * Rotate a bitboard by 90 degrees to the left.
  */
-unsigned long rotate_l90(unsigned long bb) {
+uint64_t rotate_l90(uint64_t bb) {
   bb = ((bb <<  1) & 0xAA00AA00AA00AA00) |
        ((bb >>  1) & 0x0055005500550055) |
        ((bb >>  8) & 0x00AA00AA00AA00AA) |
@@ -130,7 +130,7 @@ unsigned long rotate_l90(unsigned long bb) {
 /*
  * Rotate a bitboard by 45 degrees to the right.
  */
-unsigned long rotate_r45(unsigned long bb) {
+uint64_t rotate_r45(uint64_t bb) {
   bb = (bb & 0x0101010101010101) |
        (((bb <<  8) | (bb >> 56)) & 0x0202020202020202) |
        (((bb << 16) | (bb >> 48)) & 0x0404040404040404) |
@@ -145,7 +145,7 @@ unsigned long rotate_r45(unsigned long bb) {
 /*
  * Rotate a bitboard by 45 degrees to the left.
  */
-unsigned long rotate_l45(unsigned long bb) {
+uint64_t rotate_l45(uint64_t bb) {
   bb = (bb & 0x0101010101010101) |
        (((bb >>  8) | (bb << 56)) & 0x0202020202020202) |
        (((bb >> 16) | (bb << 48)) & 0x0404040404040404) |
@@ -157,31 +157,31 @@ unsigned long rotate_l45(unsigned long bb) {
   return bb;
 }
 
-unsigned long horizontal_pat(unsigned long my, unsigned long op, unsigned long p) {
+uint64_t horizontal_pat(uint64_t my, uint64_t op, uint64_t p) {
   op &= 0x7E7E7E7E7E7E7E7E;
   return right_pat(my, op, p) | left_pat(my, op, p);
 }
 
-unsigned long vertical_pat(unsigned long my, unsigned long op, unsigned long p) {
+uint64_t vertical_pat(uint64_t my, uint64_t op, uint64_t p) {
   my = rotate_r90(my);
   op = rotate_r90(op & 0x00FFFFFFFFFFFF00);
   p  = rotate_r90(p);
   return rotate_l90(right_pat(my, op, p) | left_pat(my, op, p));
 }
 
-unsigned long diagonal_pat(unsigned long my, unsigned long op, unsigned long p) {
-  unsigned long my_r45 = rotate_r45(my);
-  unsigned long op_r45 = rotate_r45(op & 0x007E7E7E7E7E7E00);
-  unsigned long p_r45  = rotate_r45(p);
-  unsigned long my_l45 = rotate_l45(my);
-  unsigned long op_l45 = rotate_l45(op & 0x00FF7E7E7E7E7E00);
-  unsigned long p_l45  = rotate_l45(p);
+uint64_t diagonal_pat(uint64_t my, uint64_t op, uint64_t p) {
+  uint64_t my_r45 = rotate_r45(my);
+  uint64_t op_r45 = rotate_r45(op & 0x007E7E7E7E7E7E00);
+  uint64_t p_r45  = rotate_r45(p);
+  uint64_t my_l45 = rotate_l45(my);
+  uint64_t op_l45 = rotate_l45(op & 0x00FF7E7E7E7E7E00);
+  uint64_t p_l45  = rotate_l45(p);
   return rotate_l45(right_pat(my_r45, op_r45, p_r45) | left_pat(my_r45, op_r45, p_r45)) |
          rotate_r45(right_pat(my_l45, op_l45, p_l45) | left_pat(my_l45, op_l45, p_l45));
 }
 
-unsigned long right_pat(unsigned long my, unsigned long op, unsigned long p) {
-  unsigned long rev =  (p >> 1) & op;
+uint64_t right_pat(uint64_t my, uint64_t op, uint64_t p) {
+  uint64_t rev =  (p >> 1) & op;
   rev |= (rev >> 1) & op;
   rev |= (rev >> 1) & op;
   rev |= (rev >> 1) & op;
@@ -190,8 +190,8 @@ unsigned long right_pat(unsigned long my, unsigned long op, unsigned long p) {
   return ((rev >> 1) & my) == 0 ? 0 : rev;
 }
 
-unsigned long left_pat(unsigned long my, unsigned long op, unsigned long p) {
-  unsigned long rev =  (p << 1) & op;
+uint64_t left_pat(uint64_t my, uint64_t op, uint64_t p) {
+  uint64_t rev =  (p << 1) & op;
   rev |= (rev << 1) & op;
   rev |= (rev << 1) & op;
   rev |= (rev << 1) & op;
@@ -200,31 +200,31 @@ unsigned long left_pat(unsigned long my, unsigned long op, unsigned long p) {
   return ((rev << 1) & my) == 0 ? 0 : rev;
 }
 
-unsigned long horizontal_pos(unsigned long my, unsigned long op, unsigned long blank) {
+uint64_t horizontal_pos(uint64_t my, uint64_t op, uint64_t blank) {
   op &= 0x7E7E7E7E7E7E7E7E;
   return right_pos(my, op, blank) | left_pos(my, op, blank);
 }
 
-unsigned long vertical_pos(unsigned long my, unsigned long op, unsigned long blank) {
+uint64_t vertical_pos(uint64_t my, uint64_t op, uint64_t blank) {
   my    = rotate_r90(my);
   op    = rotate_r90(op & 0x00FFFFFFFFFFFF00);
   blank = rotate_r90(blank);
   return rotate_l90(right_pos(my, op, blank) | left_pos(my, op, blank));
 }
 
-unsigned long diagonal_pos(unsigned long my, unsigned long op, unsigned long blank) {
-  unsigned long my_r45    = rotate_r45(my);
-  unsigned long op_r45    = rotate_r45(op & 0x007E7E7E7E7E7E00);
-  unsigned long blank_r45 = rotate_r45(blank);
-  unsigned long my_l45    = rotate_l45(my);
-  unsigned long op_l45    = rotate_l45(op & 0x007E7E7E7E7E7E00);
-  unsigned long blank_l45 = rotate_l45(blank);
+uint64_t diagonal_pos(uint64_t my, uint64_t op, uint64_t blank) {
+  uint64_t my_r45    = rotate_r45(my);
+  uint64_t op_r45    = rotate_r45(op & 0x007E7E7E7E7E7E00);
+  uint64_t blank_r45 = rotate_r45(blank);
+  uint64_t my_l45    = rotate_l45(my);
+  uint64_t op_l45    = rotate_l45(op & 0x007E7E7E7E7E7E00);
+  uint64_t blank_l45 = rotate_l45(blank);
   return rotate_l45(right_pos(my_r45, op_r45, blank_r45) | left_pos(my_r45, op_r45, blank_r45)) |
          rotate_r45(right_pos(my_l45, op_l45, blank_l45) | left_pos(my_l45, op_l45, blank_l45));
 }
 
-unsigned long right_pos(unsigned long my, unsigned long op, unsigned long blank) {
-  unsigned long rev =  (my  << 1) & op;
+uint64_t right_pos(uint64_t my, uint64_t op, uint64_t blank) {
+  uint64_t rev =  (my  << 1) & op;
   rev |= (rev << 1) & op;
   rev |= (rev << 1) & op;
   rev |= (rev << 1) & op;
@@ -233,8 +233,8 @@ unsigned long right_pos(unsigned long my, unsigned long op, unsigned long blank)
   return (rev << 1) & blank;
 }
 
-unsigned long left_pos(unsigned long my, unsigned long op, unsigned long blank) {
-  unsigned long rev =  (my  >> 1) & op;
+uint64_t left_pos(uint64_t my, uint64_t op, uint64_t blank) {
+  uint64_t rev =  (my  >> 1) & op;
   rev |= (rev >> 1) & op;
   rev |= (rev >> 1) & op;
   rev |= (rev >> 1) & op;

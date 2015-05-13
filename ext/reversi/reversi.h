@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "board.h"
 #include "bit_board_functions.h"
