@@ -24,7 +24,7 @@ VALUE board_initialize(VALUE self) {
 VALUE black_setter(VALUE self, VALUE black) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
-  ptr->black = NUM2ULONG(black);
+  ptr->black = NUM2ULL(black);
   return Qnil;
 }
 
@@ -36,7 +36,7 @@ VALUE black_setter(VALUE self, VALUE black) {
 VALUE white_setter(VALUE self, VALUE white) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
-  ptr->white = NUM2ULONG(white);
+  ptr->white = NUM2ULL(white);
   return Qnil;
 }
 
@@ -48,7 +48,7 @@ VALUE white_setter(VALUE self, VALUE white) {
 VALUE black_getter(VALUE self) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
-  return ULONG2NUM(ptr->black);
+  return ULL2NUM(ptr->black);
 }
 
 /*
@@ -59,7 +59,7 @@ VALUE black_getter(VALUE self) {
 VALUE white_getter(VALUE self) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
-  return ULONG2NUM(ptr->white);
+  return ULL2NUM(ptr->white);
 }
 
 /*
