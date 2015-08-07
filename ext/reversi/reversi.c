@@ -7,10 +7,10 @@ void Init_reversi(void) {
   rb_define_alloc_func(reversi_board, bit_board_alloc);
 
   /* These private methods are used in the board.rb file. */
-  rb_define_private_method(reversi_board, "black_setter", black_setter, 1);
-  rb_define_private_method(reversi_board, "white_setter", white_setter, 1);
-  rb_define_private_method(reversi_board, "black_getter", black_getter, 0);
-  rb_define_private_method(reversi_board, "white_getter", white_getter, 0);
+  rb_define_private_method(reversi_board, "set_black", set_black, 1);
+  rb_define_private_method(reversi_board, "set_white", set_white, 1);
+  rb_define_private_method(reversi_board, "get_black", get_black, 0);
+  rb_define_private_method(reversi_board, "get_white", get_white, 0);
 
   /* This method is used in the `Reversi::Board.new` method. */
   rb_define_private_method(reversi_board, "board_initialize", board_initialize, 0);

@@ -101,8 +101,8 @@ describe Reversi::Game do
       :white =>0x7F60_513B_274B_0400
     }
     it do
-      expect(game.board.send(:black_getter)).to eq ans[:black]
-      expect(game.board.send(:white_getter)).to eq ans[:white]
+      expect(game.board.send(:get_black)).to eq ans[:black]
+      expect(game.board.send(:get_white)).to eq ans[:white]
     end
   end
 end

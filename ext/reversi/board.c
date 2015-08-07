@@ -21,7 +21,7 @@ VALUE board_initialize(VALUE self) {
  *
  * @param black [Fixnum, Bignum] a bitboard for black
  */
-VALUE black_setter(VALUE self, VALUE black) {
+VALUE set_black(VALUE self, VALUE black) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
   ptr->black = NUM2ULL(black);
@@ -33,7 +33,7 @@ VALUE black_setter(VALUE self, VALUE black) {
  *
  * @param black [Fixnum, Bignum] a bitboard for white
  */
-VALUE white_setter(VALUE self, VALUE white) {
+VALUE set_white(VALUE self, VALUE white) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
   ptr->white = NUM2ULL(white);
@@ -45,7 +45,7 @@ VALUE white_setter(VALUE self, VALUE white) {
  *
  * @return [Fixnum, Bignum]
  */
-VALUE black_getter(VALUE self) {
+VALUE get_black(VALUE self) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
   return ULL2NUM(ptr->black);
@@ -56,7 +56,7 @@ VALUE black_getter(VALUE self) {
  *
  * @return [Fixnum, Bignum]
  */
-VALUE white_getter(VALUE self) {
+VALUE get_white(VALUE self) {
   struct bit_board *ptr;
   Data_Get_Struct(self, struct bit_board, ptr);
   return ULL2NUM(ptr->white);

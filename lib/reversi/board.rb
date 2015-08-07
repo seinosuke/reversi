@@ -54,8 +54,8 @@ module Reversi
       "   #{"+---"*8}+\n" <<
       (0..63).map do |i|
         case 1
-        when black_getter[63 - i] then "\e[#{@options[:disk_color_b]}m#{@options[:disk_b]}\e[0m"
-        when white_getter[63 - i] then "\e[#{@options[:disk_color_w]}m#{@options[:disk_w]}\e[0m"
+        when get_black[63 - i] then "\e[#{@options[:disk_color_b]}m#{@options[:disk_b]}\e[0m"
+        when get_white[63 - i] then "\e[#{@options[:disk_color_w]}m#{@options[:disk_w]}\e[0m"
         else " "
         end
       end
@@ -69,7 +69,7 @@ module Reversi
     # Pushes an array of the game board onto a stack.
     # The stack size limit is 3(default).
     def push_stack
-      bb = {:black => black_getter,:white => white_getter}
+      bb = {:black => get_black,:white => get_white}
       @stack.push(Marshal.load(Marshal.dump(bb)))
       @stack.shift if @stack.size > @options[:stack_limit]
     end
@@ -78,8 +78,8 @@ module Reversi
     # and that is stored in the instance variable.(`@bit_board`)
     def undo!
       bb = @stack.pop
-      black_setter(bb[:black])
-      white_setter(bb[:white])
+      set_black(bb[:black])
+      set_white(bb[:white])
     end
   end
 end
