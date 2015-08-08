@@ -21,6 +21,16 @@ VALUE BB2XY(uint64_t bb) {
 
 /*
  * Rotate a bitboard by 90 degrees to the right.
+ * 
+ * For example,
+ * 1 1 1 1 1 1 1 1    0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0    0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0    0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0    0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0 -> 0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0    0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0    0 0 0 0 0 0 0 1
+ * 0 0 0 0 0 0 0 0    0 0 0 0 0 0 0 1
  */
 uint64_t rotate_r90(uint64_t bb) {
   bb = ((bb <<  8) & 0xAA00AA00AA00AA00) |
@@ -40,6 +50,16 @@ uint64_t rotate_r90(uint64_t bb) {
 
 /*
  * Rotate a bitboard by 90 degrees to the left.
+ * 
+ * For example,
+ * 1 1 1 1 1 1 1 1    1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0    1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0    1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0    1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0 -> 1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0    1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0    1 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 0    1 0 0 0 0 0 0 0
  */
 uint64_t rotate_l90(uint64_t bb) {
   bb = ((bb <<  1) & 0xAA00AA00AA00AA00) |
@@ -59,6 +79,16 @@ uint64_t rotate_l90(uint64_t bb) {
 
 /*
  * Rotate a bitboard by 45 degrees to the right.
+ * 
+ * For example,
+ * 0 0 0 0 0 0 0 1    1 1 1 1 1 1 1 1
+ * 0 0 0 0 0 0 1 0    0 0 0 0 0 0 0 0
+ * 0 0 0 0 0 1 0 0    0 0 0 0 0 0 0 0
+ * 0 0 0 0 1 0 0 0    0 0 0 0 0 0 0 0
+ * 0 0 0 1 0 0 0 0 -> 0 0 0 0 0 0 0 0
+ * 0 0 1 0 0 0 0 0    0 0 0 0 0 0 0 0
+ * 0 1 0 0 0 0 0 0    0 0 0 0 0 0 0 0
+ * 1 0 0 0 0 0 0 0    0 0 0 0 0 0 0 0
  */
 uint64_t rotate_r45(uint64_t bb) {
   bb = (bb & 0x0101010101010101) |
@@ -74,6 +104,16 @@ uint64_t rotate_r45(uint64_t bb) {
 
 /*
  * Rotate a bitboard by 45 degrees to the left.
+ * 
+ * For example,
+ * 1 0 0 0 0 0 0 0    0 0 0 0 0 0 0 0
+ * 0 1 0 0 0 0 0 0    0 0 0 0 0 0 0 0
+ * 0 0 1 0 0 0 0 0    0 0 0 0 0 0 0 0
+ * 0 0 0 1 0 0 0 0    0 0 0 0 0 0 0 0
+ * 0 0 0 0 1 0 0 0 -> 0 0 0 0 0 0 0 0
+ * 0 0 0 0 0 1 0 0    0 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 1 0    0 0 0 0 0 0 0 0
+ * 0 0 0 0 0 0 0 1    1 1 1 1 1 1 1 1
  */
 uint64_t rotate_l45(uint64_t bb) {
   bb = (bb & 0x0101010101010101) |
@@ -87,11 +127,45 @@ uint64_t rotate_l45(uint64_t bb) {
   return bb;
 }
 
+/*
+ * 'p' is a position of player's move, 'XY2BB(FIX2INT(rb_x), FIX2INT(rb_y))'.
+ * 'my' is a bitboard of my disks, and 'op' is a bitboard of  opponent's disks.
+ * horizontal_pat, vertical_pat and diagonal_pat method
+ * are used in Reversi::Board#flip_disks method to get the positions
+ * of the opponent's disks between a new disk and another disk of my color.
+ * 
+ * This method returns a bitboard of flippable oppenent's disks 
+ * in the horizontal direction.
+ *
+ * A mask for the horizontal direction is '0x7E7E7E7E7E7E7E7E'.
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ */
 uint64_t horizontal_pat(uint64_t my, uint64_t op, uint64_t p) {
   op &= 0x7E7E7E7E7E7E7E7E;
   return right_pat(my, op, p) | left_pat(my, op, p);
 }
 
+/*
+ * This method returns a bitboard of flippable oppenent's disks 
+ * in the vertical direction.
+ *
+ * A mask for the vertical direction is '0x00FFFFFFFFFFFF00'.
+ * 0 0 0 0 0 0 0 0
+ * 1 1 1 1 1 1 1 1
+ * 1 1 1 1 1 1 1 1
+ * 1 1 1 1 1 1 1 1
+ * 1 1 1 1 1 1 1 1
+ * 1 1 1 1 1 1 1 1
+ * 1 1 1 1 1 1 1 1
+ * 0 0 0 0 0 0 0 0
+ */
 uint64_t vertical_pat(uint64_t my, uint64_t op, uint64_t p) {
   my = rotate_r90(my);
   op = rotate_r90(op & 0x00FFFFFFFFFFFF00);
@@ -99,17 +173,35 @@ uint64_t vertical_pat(uint64_t my, uint64_t op, uint64_t p) {
   return rotate_l90(right_pat(my, op, p) | left_pat(my, op, p));
 }
 
+/*
+ * This method returns a bitboard of flippable oppenent's disks 
+ * in the diagonal direction.
+ *
+ * a masks for the diagonal direction is '0x007E7E7E7E7E7E00'.
+ * 0 0 0 0 0 0 0 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 1 1 1 1 1 1 0
+ * 0 0 0 0 0 0 0 0
+ */
 uint64_t diagonal_pat(uint64_t my, uint64_t op, uint64_t p) {
   uint64_t my_r45 = rotate_r45(my);
   uint64_t op_r45 = rotate_r45(op & 0x007E7E7E7E7E7E00);
   uint64_t p_r45  = rotate_r45(p);
   uint64_t my_l45 = rotate_l45(my);
-  uint64_t op_l45 = rotate_l45(op & 0x00FF7E7E7E7E7E00);
+  uint64_t op_l45 = rotate_l45(op & 0x007E7E7E7E7E7E00);
   uint64_t p_l45  = rotate_l45(p);
   return rotate_l45(right_pat(my_r45, op_r45, p_r45) | left_pat(my_r45, op_r45, p_r45)) |
          rotate_r45(right_pat(my_l45, op_l45, p_l45) | left_pat(my_l45, op_l45, p_l45));
 }
 
+/*
+ * This method returns a bitboard of flippable oppenent's disks 
+ * in the right direction.
+ */
 uint64_t right_pat(uint64_t my, uint64_t op, uint64_t p) {
   uint64_t rev =  (p >> 1) & op;
   rev |= (rev >> 1) & op;
@@ -120,6 +212,10 @@ uint64_t right_pat(uint64_t my, uint64_t op, uint64_t p) {
   return ((rev >> 1) & my) == 0 ? 0 : rev;
 }
 
+/*
+ * This method returns a bitboard of flippable oppenent's disks 
+ * in the left direction.
+ */
 uint64_t left_pat(uint64_t my, uint64_t op, uint64_t p) {
   uint64_t rev =  (p << 1) & op;
   rev |= (rev << 1) & op;
@@ -130,11 +226,24 @@ uint64_t left_pat(uint64_t my, uint64_t op, uint64_t p) {
   return ((rev << 1) & my) == 0 ? 0 : rev;
 }
 
+/*
+ * 'p' is a position of player's move, 'XY2BB(FIX2INT(rb_x), FIX2INT(rb_y))'.
+ * 'my' is a bitboard of my disks, and 'op' is a bitboard of  opponent's disks.
+ * horizontal_pos, vertical_pos and diagonal_pos method
+ * are used in Reversi::Board#next_moves method to get positions of the next move.
+ * 
+ * This method returns a bitboard of nextmove's positions
+ * in the horizontal direction.
+ */
 uint64_t horizontal_pos(uint64_t my, uint64_t op, uint64_t blank) {
   op &= 0x7E7E7E7E7E7E7E7E;
   return right_pos(my, op, blank) | left_pos(my, op, blank);
 }
 
+/*
+ * This method returns a bitboard of nextmove's positions
+ * in the vertical direction.
+ */
 uint64_t vertical_pos(uint64_t my, uint64_t op, uint64_t blank) {
   my    = rotate_r90(my);
   op    = rotate_r90(op & 0x00FFFFFFFFFFFF00);
@@ -142,6 +251,10 @@ uint64_t vertical_pos(uint64_t my, uint64_t op, uint64_t blank) {
   return rotate_l90(right_pos(my, op, blank) | left_pos(my, op, blank));
 }
 
+/*
+ * This method returns a bitboard of nextmove's positions
+ * in the diagonal direction.
+ */
 uint64_t diagonal_pos(uint64_t my, uint64_t op, uint64_t blank) {
   uint64_t my_r45    = rotate_r45(my);
   uint64_t op_r45    = rotate_r45(op & 0x007E7E7E7E7E7E00);
@@ -153,6 +266,10 @@ uint64_t diagonal_pos(uint64_t my, uint64_t op, uint64_t blank) {
          rotate_r45(right_pos(my_l45, op_l45, blank_l45) | left_pos(my_l45, op_l45, blank_l45));
 }
 
+/*
+ * This method returns a bitboard of nextmove's positions
+ * in the right direction.
+ */
 uint64_t right_pos(uint64_t my, uint64_t op, uint64_t blank) {
   uint64_t rev =  (my  << 1) & op;
   rev |= (rev << 1) & op;
@@ -163,6 +280,10 @@ uint64_t right_pos(uint64_t my, uint64_t op, uint64_t blank) {
   return (rev << 1) & blank;
 }
 
+/*
+ * This method returns a bitboard of nextmove's positions
+ * in the left direction.
+ */
 uint64_t left_pos(uint64_t my, uint64_t op, uint64_t blank) {
   uint64_t rev =  (my  >> 1) & op;
   rev |= (rev >> 1) & op;
