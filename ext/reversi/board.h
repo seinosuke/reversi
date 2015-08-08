@@ -11,10 +11,10 @@ struct bit_board {
 VALUE bit_board_alloc(VALUE class);
 VALUE board_initialize(VALUE self);
 
-VALUE black_setter(VALUE self, VALUE black);
-VALUE white_setter(VALUE self, VALUE white);
-VALUE black_getter(VALUE self);
-VALUE white_getter(VALUE self);
+VALUE set_black(VALUE self, VALUE black);
+VALUE set_white(VALUE self, VALUE white);
+VALUE get_black(VALUE self);
+VALUE get_white(VALUE self);
 
 VALUE status(VALUE self);
 VALUE openness(VALUE self, VALUE rb_x, VALUE rb_y);

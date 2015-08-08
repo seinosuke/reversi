@@ -27,20 +27,24 @@ module Reversi
 
     attr_accessor *OPTIONS_KEYS
 
+    # This method is used for setting configuration options.
     def configure
       yield self
     end
 
+    # Create a hash of options.
     def options
       Hash[*OPTIONS_KEYS.map{|key| [key, send(key)]}.flatten]
     end
 
+    # Reset all options to their default values.
     def reset
       DEFAULTS.each do |option, default|
         self.send("#{option}=".to_sym, default)
       end
     end
 
+    # Set default value for the option that is still not set.
     def set_defaults
       DEFAULTS.each do |option, default|
         default.class == String ?
